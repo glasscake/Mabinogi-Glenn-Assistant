@@ -1,4 +1,4 @@
-namespace Mabinogi_Glenn_Death_Timer_OpenCV
+namespace Mabi_CV
 {
     internal static class Program
     {
@@ -11,7 +11,7 @@ namespace Mabinogi_Glenn_Death_Timer_OpenCV
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
-            Application.Run(new Form1());
+            Application.Run(new Main());
         }
     }
 }
