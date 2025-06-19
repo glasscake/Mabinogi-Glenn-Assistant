@@ -9,6 +9,9 @@ using HPPH;
 using OpenCvSharp;
 using ScreenCapture;
 using ScreenCapture.NET;
+using Vortice.Mathematics;
+using Tesseract;
+
 
 
 namespace Mabi_CV
@@ -16,18 +19,40 @@ namespace Mabi_CV
     public class ScreenWatcher
     {
         DX11ScreenCaptureService screenCaptureService = new DX11ScreenCaptureService();
-        public Bitmap debugging;
+        IEnumerable<GraphicsCard> graphicsCards;
+        IEnumerable<Display> displays;
         DX11ScreenCapture screenCapture;
+
+        public Bitmap debugging;
+        public Mat debugging_mat;
+
         CaptureZone<ColorBGRA> fullscreen;
         private int garbagecollector_counter;
         public ScreenWatcher()
         {
-            IEnumerable<GraphicsCard> graphicsCards = screenCaptureService.GetGraphicsCards();
-            IEnumerable<Display> displays = screenCaptureService.GetDisplays(graphicsCards.First());
-            screenCapture = screenCaptureService.GetScreenCapture(displays.First());
-            fullscreen = screenCapture.RegisterCaptureZone(0, 0, screenCapture.Display.Width, screenCapture.Display.Height);
+            setupScrenCap();
+            OpenCvSharp.Rect box = new OpenCvSharp.Rect(0,0, screenCapture.Display.Width, screenCapture.Display.Height);
+            _ScreenWatcher(box);
+        }
+        public ScreenWatcher(OpenCvSharp.Rect cropbox)
+        {
+            _ScreenWatcher(cropbox);
+        }
+        
+        private void _ScreenWatcher(OpenCvSharp.Rect cropbox)
+        {
+            setupScrenCap();
+            fullscreen = screenCapture.RegisterCaptureZone(cropbox.TopLeft.X, cropbox.TopLeft.Y, cropbox.Width, cropbox.Height);
             screenCapture.CaptureScreen();
             newimage();
+        }
+
+        private void setupScrenCap()
+        {
+            if (graphicsCards != null) { return; }
+            graphicsCards = screenCaptureService.GetGraphicsCards();
+            displays = screenCaptureService.GetDisplays(graphicsCards.First());
+            screenCapture = screenCaptureService.GetScreenCapture(displays.First());
         }
 
         public unsafe void newimage()
@@ -40,15 +65,34 @@ namespace Mabi_CV
                 Mat material = new Mat(image.Height, image.Width, MatType.CV_8UC4);
                 image.CopyTo(new Span<ColorBGRA>((void*)material.DataPointer, image.Width * image.Height));
                 debugging = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(material);
+                debugging_mat = material.Clone();
                 material.Dispose();
             }
-            if(garbagecollector_counter > 40)
+            if(garbagecollector_counter > 300)
             {
                 GC.Collect();
                 garbagecollector_counter = 0;
             }
         }
 
+
+    }
+    public class OCR
+    {
+        TesseractEngine engine = new TesseractEngine(@"./Refrences", "eng", EngineMode.Default);
+
+        public  OCR() 
+        {
+           
+        }
+
+        public string Read(Bitmap img)
+        {
+            Page page = engine.Process(img);
+            string results = page.GetText();
+            page.Dispose();
+            return results;
+        }
 
     }
 }
