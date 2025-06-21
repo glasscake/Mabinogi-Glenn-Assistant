@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Mabi_CV
 {
     internal static class Program
@@ -12,6 +14,7 @@ namespace Mabi_CV
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
             Application.Run(new Main());
+            
         }
     }
 }

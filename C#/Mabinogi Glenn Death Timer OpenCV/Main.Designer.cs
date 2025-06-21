@@ -176,6 +176,7 @@
             Controls.Add(pb_debugging);
             Name = "Main";
             Text = "Main";
+            Load += Main_Load;
             ((System.ComponentModel.ISupportInitialize)pb_debugging).EndInit();
             pnl_Crop.ResumeLayout(false);
             pnl_Crop.PerformLayout();

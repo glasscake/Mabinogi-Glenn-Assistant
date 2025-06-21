@@ -16,7 +16,7 @@ using Tesseract;
 
 namespace Mabi_CV
 {
-    public class ScreenWatcher
+    public class Mabi_CV
     {
         DX11ScreenCaptureService screenCaptureService = new DX11ScreenCaptureService();
         IEnumerable<GraphicsCard> graphicsCards;
@@ -28,13 +28,13 @@ namespace Mabi_CV
 
         CaptureZone<ColorBGRA> fullscreen;
         private int garbagecollector_counter;
-        public ScreenWatcher()
+        public Mabi_CV()
         {
             setupScrenCap();
             OpenCvSharp.Rect box = new OpenCvSharp.Rect(0,0, screenCapture.Display.Width, screenCapture.Display.Height);
             _ScreenWatcher(box);
         }
-        public ScreenWatcher(OpenCvSharp.Rect cropbox)
+        public Mabi_CV(OpenCvSharp.Rect cropbox)
         {
             _ScreenWatcher(cropbox);
         }
