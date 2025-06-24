@@ -21,42 +21,75 @@ namespace Mabi_CV
 {
     public partial class Main : Form
     {
-        Thread livestream;
+        Thread DoomMonitor;
         List<DoomTimer> timers = new List<DoomTimer>();
+        CancellationTokenSource cts_doom = new CancellationTokenSource();
+        ScreenCapture screencap = new ScreenCapture();
+
+
         public Main()
         {
             InitializeComponent();
-            livestream = new Thread(DoomParser);
-            livestream.Start();
+            start_doom_monitor();
+            Thread test = new Thread(() => Boss_HP_Monitor());
+            test.Start();
         }
 
         private void btn_debugging_Click(object sender, EventArgs e)
         {
         }
 
-        private void Boss_HP_Monitor()
+        private void reset_doom_monitor()
         {
-            OCR reader = new OCR();
-            Mabi_CV DoomWindow_Cap = new Mabi_CV(new OpenCvSharp.Rect(1022, 1250, 1535 - 1022, 1280 - 1250));
-            while (true)
+            stop_doom_monitor();
+            start_doom_monitor();
+        }
+        private void stop_doom_monitor()
+        {
+            cts_doom.Cancel();
+            Stopwatch timeoput = new Stopwatch();
+            timeoput.Start();
+            while (DoomMonitor.ThreadState == System.Threading.ThreadState.Running && timeoput.ElapsedMilliseconds < 10 * 1000)
             {
 
             }
         }
+        private void start_doom_monitor()
+        {
+            cts_doom = new CancellationTokenSource();
+            DoomMonitor = new Thread(() => DoomParser(cts_doom.Token));
+            DoomMonitor.Start();
+        }
+        private void Boss_HP_Monitor()
+        {
+            OCR reader = new OCR();
+            SubCapture HpBar_cap = new SubCapture(screencap.GetCrop, new OpenCvSharp.Rect(1022, 1250, 1535 - 1022, 1280 - 1250));
+            while (true)
+            {
+                Thread.Sleep(33);
+                pb_bosshp.Invoke(() => pb_bosshp.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(HpBar_cap.Crop));
+            }
+        }
 
-        private void DoomParser()
+
+        private void DoomParser(CancellationToken token)
         {
             Mat mask = new Mat();
             OCR reader = new OCR();
-            Mabi_CV DoomWindow_Cap = new Mabi_CV(new OpenCvSharp.Rect(2220, 160, 2560 - 2220, 318 - 160));
+
+            SubCapture DoomWindow_Cap = new SubCapture(screencap.GetCrop ,new OpenCvSharp.Rect(2170, 160, 2560 - 2170, 318 - 160));
+
             string output;
             Taylors_Countdown_Timer FirstTry = new Taylors_Countdown_Timer(10);
             while (true)
             {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
                 Thread.Sleep(15);
 
-                DoomWindow_Cap.newimage();
-                mask = DoomWindow_Cap.debugging_mat.Clone();
+                mask = DoomWindow_Cap.Crop.Clone();
                 Cv2.Resize(mask, mask, new OpenCvSharp.Size(mask.Width * 3, mask.Height * 3));
 
                 DoomWindow_Cap.CorrectGamma(mask, mask, .3);
@@ -75,36 +108,40 @@ namespace Mabi_CV
                 List<DoomTimer> reader_timers = reader.ParseDoom(output);
                 Cull_DoomTimer_List(reader_timers, ref timers);
                 output = "";
-                foreach(DoomTimer timer in timers)
+                foreach (DoomTimer timer in timers)
                 {
                     output = output + timer.Name + " has " + timer.Timer.Time_Remaining.ToString() + " and has reoccured" + timer.Rerecognition_Count.ToString() + " \n";
                 }
 
                 richtx_debugging.Invoke(() => richtx_debugging.Text = output);
             }
+            mask.Dispose();
+            timers.ForEach(item => item.Dispose());
+            timers.Clear();
+
         }
 
-        
-        
+
+
         private void Cull_DoomTimer_List(List<DoomTimer> fresh, ref List<DoomTimer> reoccuring)
         {
-            if (fresh == null) {  return; }   
+            if (fresh == null) { return; }
             if (fresh.Count == 0) { return; }
 
             //do we have 4 good names with lots of recognitions
-            int maxcount = 0 ;
+            int maxcount = 0;
             if (reoccuring.Count > 0)
             {
                 maxcount = reoccuring.Select(item => item.Rerecognition_Count).Max();
             }
-            if (reoccuring.Count >= 4 && maxcount > 100)
+            if (reoccuring.Count >= 4 && maxcount > 25)
             {
-                //first, get rid of all the lines that dont have many counts
-                reoccuring.RemoveAll(item => item.Rerecognition_Count < 5);
                 //now get rid of any that are not close to the max count
-                reoccuring.RemoveAll(item => item.Rerecognition_Count < maxcount*0.5);
+                reoccuring.RemoveAll(item => item.Rerecognition_Count < maxcount * 0.5);
+                reoccuring.ForEach(item => item.Change_Beep(ckbx_doom_Beep.Checked));
+                reoccuring.ForEach(item => item.Change_voice(ckbx_doomVoice.Checked));
             }
-   
+
             //if we are empty lets start to fill the list
             if (reoccuring.Count == 0)
             {
@@ -116,11 +153,11 @@ namespace Mabi_CV
 
             //ok lets check how close the names are in the reoccuring list and the new list if theyre within 2 characters of each other then we know we have a good read
             //there is probably a cleaner way to do this with linq
-            foreach(DoomTimer org_timer in reoccuring)
+            foreach (DoomTimer org_timer in reoccuring)
             {
                 foreach (DoomTimer fresh_timer in fresh.ToList())
                 {
-                    if( LevenshteinDistance.Compute(fresh_timer.Name, org_timer.Name) <= 2)
+                    if (LevenshteinDistance.Compute(fresh_timer.Name, org_timer.Name) <= 2)
                     {
                         org_timer.Rerecognition_Count++;
                         fresh.Remove(fresh_timer);
@@ -138,8 +175,13 @@ namespace Mabi_CV
 
         private void Main_Load(object sender, EventArgs e)
         {
-            //Application.OpenForms[0].Location = Screen.AllScreens[1].WorkingArea.Location;
+            Application.OpenForms[0].Location = Screen.AllScreens[1].WorkingArea.Location;
+        }
+
+        private void btn_resetDoom_Click(object sender, EventArgs e)
+        {
+            reset_doom_monitor();
         }
     }
-    
+
 }

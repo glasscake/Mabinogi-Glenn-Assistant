@@ -19,65 +19,115 @@ using System.Speech.Synthesis;
 
 namespace Mabi_CV
 {
-    public class Mabi_CV
+    public class ScreenCapture
     {
         DX11ScreenCaptureService screenCaptureService = new DX11ScreenCaptureService();
         IEnumerable<GraphicsCard> graphicsCards;
         IEnumerable<Display> displays;
         DX11ScreenCapture screenCapture;
-
-        public Bitmap debugging;
-        public Mat debugging_mat;
-
-        CaptureZone<ColorBGRA> fullscreen;
         private int garbagecollector_counter;
-        public Mabi_CV()
-        {
-            setupScrenCap();
-            OpenCvSharp.Rect box = new OpenCvSharp.Rect(0, 0, screenCapture.Display.Width, screenCapture.Display.Height);
-            _ScreenWatcher(box);
-        }
-        public Mabi_CV(OpenCvSharp.Rect cropbox)
-        {
-            _ScreenWatcher(cropbox);
-        }
+        Thread LiveStream ;
+        CaptureZone<ColorBGRA> fullscreen_capture_zone;
+        Mat fullscreen_mat = new Mat();
+        CancellationTokenSource cts = new CancellationTokenSource();
+        int Refresh_Rate_ms;
 
-        private void _ScreenWatcher(OpenCvSharp.Rect cropbox)
+        public ScreenCapture(int refresh_rate)
         {
-            setupScrenCap();
-            fullscreen = screenCapture.RegisterCaptureZone(cropbox.TopLeft.X, cropbox.TopLeft.Y, cropbox.Width, cropbox.Height);
-            screenCapture.CaptureScreen();
-            newimage();
+            _ScreenCapture(refresh_rate);
         }
-
-        private void setupScrenCap()
+        public ScreenCapture()
+        {
+            _ScreenCapture(15);
+        }
+        private void _ScreenCapture(int ms)
         {
             if (graphicsCards != null) { return; }
             graphicsCards = screenCaptureService.GetGraphicsCards();
             displays = screenCaptureService.GetDisplays(graphicsCards.First());
             screenCapture = screenCaptureService.GetScreenCapture(displays.First());
+            fullscreen_capture_zone = screenCapture.RegisterCaptureZone(0, 0, screenCapture.Display.Width, screenCapture.Display.Height);
+            fullscreen_mat = new Mat(screenCapture.Display.Height, screenCapture.Display.Width, MatType.CV_8UC4);
+            start_livestream();
         }
-
-        public unsafe void newimage()
+        public unsafe void newimage(int refresh_rate_ms, CancellationToken token)
+        {
+            Stopwatch sw = Stopwatch.StartNew();
+            while (token.IsCancellationRequested == false)
+            {
+                while (sw.ElapsedMilliseconds < refresh_rate_ms) { }
+                sw.Restart();
+                garbagecollector_counter++;
+                screenCapture.CaptureScreen();
+                using (fullscreen_capture_zone.Lock())
+                {
+                    IImage<ColorBGRA> image = fullscreen_capture_zone.Image;
+                    lock (fullscreen_mat)
+                    {
+                        image.CopyTo(new Span<ColorBGRA>((void*)fullscreen_mat.DataPointer, image.Width * image.Height));
+                    }
+                }
+                if (garbagecollector_counter > 500)
+                {
+                    GC.Collect();
+                    garbagecollector_counter = 0;
+                }
+            }
+            GC.Collect();
+        }
+        public void stop_livestream()
+        {
+            cts.Cancel();
+        }
+        public void start_livestream()
+        {
+            Stopwatch timeout = Stopwatch.StartNew();
+            if (LiveStream == null)
+            {
+                _start_livestream();
+                return;
+            }
+            while (LiveStream.ThreadState == System.Threading.ThreadState.Running && timeout.ElapsedMilliseconds < 5000) { }
+            if(timeout.ElapsedMilliseconds > 5000) { return; }
+            _start_livestream();
+        }
+        private void _start_livestream()
+        {
+            cts = new CancellationTokenSource();
+            LiveStream = new Thread(() => newimage(Refresh_Rate_ms, cts.Token));
+            LiveStream.Start();
+        }
+        public Mat GetCrop(OpenCvSharp.Rect rect)
         {
             garbagecollector_counter++;
-            screenCapture.CaptureScreen();
-            using (fullscreen.Lock())
-            {
-                IImage<ColorBGRA> image = fullscreen.Image;
-                Mat material = new Mat(image.Height, image.Width, MatType.CV_8UC4);
-                image.CopyTo(new Span<ColorBGRA>((void*)material.DataPointer, image.Width * image.Height));
-                debugging = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(material);
-                debugging_mat = material.Clone();
-                material.Dispose();
-            }
-            if (garbagecollector_counter > 300)
-            {
-                GC.Collect();
-                garbagecollector_counter = 0;
-            }
+            return fullscreen_mat[rect].Clone();
         }
 
+    }
+
+    public class SubCapture
+    {
+        public OpenCvSharp.Rect CropBox;
+        public Mat Crop 
+        {
+            get { return Refresh_Mat.Invoke(CropBox); }
+            protected set { }
+        }
+        public Bitmap Crop_Image
+        {
+            get { return OpenCvSharp.Extensions.BitmapConverter.ToBitmap(Refresh_Mat.Invoke(CropBox)); }
+            protected set { }
+        }
+        public delegate Mat Get_Mat(OpenCvSharp.Rect rect);
+        Get_Mat Refresh_Mat;
+
+       public SubCapture(Get_Mat del, OpenCvSharp.Rect rect) 
+       {
+            Refresh_Mat = del;
+            CropBox = rect;
+       }
+       
+       
         public void CorrectGamma(Mat src, Mat dst, double gamma)
         {
             byte[] lut = new byte[256];
@@ -89,6 +139,8 @@ namespace Mabi_CV
             Cv2.LUT(src, lut, dst);
         }
     }
+
+
     public class OCR
     {
         TesseractEngine engine = new TesseractEngine(@"./Refrences", "eng", EngineMode.Default);
@@ -150,7 +202,8 @@ namespace Mabi_CV
                 if (reg_min_sec.Count(clean) != 1 && reg_sec_only.Count(clean) != 1) { continue; }
                 //we have a name and some time lets parse the name
                 string name = reg_parse_name.Match(clean).Value;
-                //remove the ' :'
+                if (name == "") { continue; }   
+                //remove the ' : '
                 name = name.Substring(0, name.Length - 2);
                 //find if we are minutes and seconds or just seconds only one can be true so no need for else if
                 int minutes = 0;
@@ -282,15 +335,18 @@ namespace Mabi_CV
     }
 
 
-    public class DoomTimer
+    public class DoomTimer : IDisposable
     {
         public String Name;
         public Taylors_Countdown_Timer Timer;
         public bool Enable_beep;
+        private bool beeped = false;
         public bool Enable_speach;
+        private bool spoke = false;
         public string Error;
         public int Rerecognition_Count;
         Thread monitor;
+        private CancellationTokenSource cts = new CancellationTokenSource();
         public DoomTimer(string error)
         {
             Error = error;
@@ -301,46 +357,54 @@ namespace Mabi_CV
             Timer = timer;
             Enable_beep = enable_beep;
             Enable_speach = enable_speach;
+            monitor = new Thread(() => monitor_timer(cts.Token));
+            monitor.Name = name;    
             if (Enable_beep == true || enable_speach == true)
             {
-                monitor = new Thread(monitor_timer);
+                monitor.Start();
             }
         }
+        public void Dispose()
+        {
+            cts.Cancel();
+        }
+        
         public void Change_Beep(bool state)
         {
             Enable_beep = state;
-            if(Enable_beep == true && monitor.IsAlive == false)
+            if(Enable_beep == true && monitor.ThreadState == System.Threading.ThreadState.Unstarted)
             {
-                monitor = new Thread(monitor_timer);
+                monitor.Start();
             }
         }
 
         public void Change_voice(bool state)
         {
             Enable_speach = state;
-            if (Enable_speach == true && monitor.IsAlive == false)
+            if (Enable_speach == true && monitor.ThreadState == System.Threading.ThreadState.Unstarted)
             {
-                monitor = new Thread(monitor_timer);
+                monitor.Start();
             }
         }
 
-        private void monitor_timer()
+        private void monitor_timer(CancellationToken token)
         {
-            while (Timer.Time_Remaining != 0)
+            while (Timer.Time_Remaining != 0 && (Enable_beep == true || Enable_speach == true) && token.IsCancellationRequested == false)
             {
-                if (Timer.Time_Remaining > 20 && Timer.Time_Remaining < 30 && Enable_beep == true)
+                if (Timer.Time_Remaining < 30 && Enable_beep == true && beeped == false)
                 {
                     Console.Beep(400, 500);
-                    Enable_beep = false;
+                    beeped = true;
                 }
-                if (Timer.Time_Remaining > 20 && Timer.Time_Remaining < 30 && Enable_speach == true)
+                if (Timer.Time_Remaining < 30 && Enable_speach == true && spoke == false)
                 {
                     SpeechSynthesizer synth = new SpeechSynthesizer();
                     synth.SpeakAsync(Name + Timer.Time_Remaining.ToString() + " seconds");
-                    Enable_speach = false;
+                    spoke = true;
                 }
             }
         }
 
     }
+
 }
