@@ -31,6 +31,15 @@
             pb_debugging = new PictureBox();
             doom_tl_x = new TextBox();
             pnl_Crop = new Panel();
+            label6 = new Label();
+            label7 = new Label();
+            label8 = new Label();
+            label9 = new Label();
+            hp_br_y = new TextBox();
+            hp_tl_y = new TextBox();
+            hp_br_x = new TextBox();
+            label10 = new Label();
+            hp_tl_x = new TextBox();
             label5 = new Label();
             label4 = new Label();
             label3 = new Label();
@@ -43,10 +52,10 @@
             tc_main = new TabControl();
             tp_main = new TabPage();
             tp_debug = new TabPage();
+            pb_bosshp = new PictureBox();
             btn_resetDoom = new Button();
             ckbx_doomVoice = new CheckBox();
             ckbx_doom_Beep = new CheckBox();
-            pb_bosshp = new PictureBox();
             ((System.ComponentModel.ISupportInitialize)pb_debugging).BeginInit();
             pnl_Crop.SuspendLayout();
             tc_main.SuspendLayout();
@@ -73,6 +82,15 @@
             // 
             // pnl_Crop
             // 
+            pnl_Crop.Controls.Add(label6);
+            pnl_Crop.Controls.Add(label7);
+            pnl_Crop.Controls.Add(label8);
+            pnl_Crop.Controls.Add(label9);
+            pnl_Crop.Controls.Add(hp_br_y);
+            pnl_Crop.Controls.Add(hp_tl_y);
+            pnl_Crop.Controls.Add(hp_br_x);
+            pnl_Crop.Controls.Add(label10);
+            pnl_Crop.Controls.Add(hp_tl_x);
             pnl_Crop.Controls.Add(label5);
             pnl_Crop.Controls.Add(label4);
             pnl_Crop.Controls.Add(label3);
@@ -84,8 +102,85 @@
             pnl_Crop.Controls.Add(doom_tl_x);
             pnl_Crop.Location = new Point(742, 51);
             pnl_Crop.Name = "pnl_Crop";
-            pnl_Crop.Size = new Size(279, 139);
+            pnl_Crop.Size = new Size(279, 297);
             pnl_Crop.TabIndex = 3;
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Location = new Point(146, 157);
+            label6.Name = "label6";
+            label6.Size = new Size(78, 15);
+            label6.TabIndex = 18;
+            label6.Text = "Bottom Right";
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new Point(21, 207);
+            label7.Name = "label7";
+            label7.Size = new Size(13, 15);
+            label7.TabIndex = 17;
+            label7.Text = "y";
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new Point(21, 178);
+            label8.Name = "label8";
+            label8.Size = new Size(13, 15);
+            label8.TabIndex = 12;
+            label8.Text = "x";
+            // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Location = new Point(40, 157);
+            label9.Name = "label9";
+            label9.Size = new Size(49, 15);
+            label9.TabIndex = 16;
+            label9.Text = "Top Left";
+            // 
+            // hp_br_y
+            // 
+            hp_br_y.Location = new Point(146, 204);
+            hp_br_y.Name = "hp_br_y";
+            hp_br_y.Size = new Size(100, 23);
+            hp_br_y.TabIndex = 15;
+            hp_br_y.Text = "1280";
+            // 
+            // hp_tl_y
+            // 
+            hp_tl_y.Location = new Point(40, 204);
+            hp_tl_y.Name = "hp_tl_y";
+            hp_tl_y.Size = new Size(100, 23);
+            hp_tl_y.TabIndex = 14;
+            hp_tl_y.Text = "1250";
+            // 
+            // hp_br_x
+            // 
+            hp_br_x.Location = new Point(146, 175);
+            hp_br_x.Name = "hp_br_x";
+            hp_br_x.Size = new Size(100, 23);
+            hp_br_x.TabIndex = 13;
+            hp_br_x.Text = "1535";
+            // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.Location = new Point(3, 131);
+            label10.Name = "label10";
+            label10.Size = new Size(88, 15);
+            label10.TabIndex = 11;
+            label10.Text = "BOSS HP CROP";
+            // 
+            // hp_tl_x
+            // 
+            hp_tl_x.Location = new Point(40, 175);
+            hp_tl_x.Name = "hp_tl_x";
+            hp_tl_x.Size = new Size(100, 23);
+            hp_tl_x.TabIndex = 10;
+            hp_tl_x.Text = "1022";
             // 
             // label5
             // 
@@ -158,9 +253,9 @@
             // 
             // richtx_debugging
             // 
-            richtx_debugging.Location = new Point(742, 211);
+            richtx_debugging.Location = new Point(745, 379);
             richtx_debugging.Name = "richtx_debugging";
-            richtx_debugging.Size = new Size(279, 201);
+            richtx_debugging.Size = new Size(442, 201);
             richtx_debugging.TabIndex = 5;
             richtx_debugging.Text = "";
             // 
@@ -180,7 +275,7 @@
             tp_main.Location = new Point(4, 24);
             tp_main.Name = "tp_main";
             tp_main.Padding = new Padding(3);
-            tp_main.Size = new Size(1438, 616);
+            tp_main.Size = new Size(1575, 773);
             tp_main.TabIndex = 0;
             tp_main.Text = "Main";
             tp_main.UseVisualStyleBackColor = true;
@@ -202,9 +297,18 @@
             tp_debug.Text = "Debugging";
             tp_debug.UseVisualStyleBackColor = true;
             // 
+            // pb_bosshp
+            // 
+            pb_bosshp.Location = new Point(26, 406);
+            pb_bosshp.Name = "pb_bosshp";
+            pb_bosshp.Size = new Size(675, 92);
+            pb_bosshp.SizeMode = PictureBoxSizeMode.Zoom;
+            pb_bosshp.TabIndex = 9;
+            pb_bosshp.TabStop = false;
+            // 
             // btn_resetDoom
             // 
-            btn_resetDoom.Location = new Point(1159, 387);
+            btn_resetDoom.Location = new Point(1229, 367);
             btn_resetDoom.Name = "btn_resetDoom";
             btn_resetDoom.Size = new Size(102, 45);
             btn_resetDoom.TabIndex = 8;
@@ -235,15 +339,6 @@
             ckbx_doom_Beep.TabIndex = 6;
             ckbx_doom_Beep.Text = "Doom Beep";
             ckbx_doom_Beep.UseVisualStyleBackColor = true;
-            // 
-            // pb_bosshp
-            // 
-            pb_bosshp.Location = new Point(26, 406);
-            pb_bosshp.Name = "pb_bosshp";
-            pb_bosshp.Size = new Size(675, 92);
-            pb_bosshp.SizeMode = PictureBoxSizeMode.Zoom;
-            pb_bosshp.TabIndex = 9;
-            pb_bosshp.TabStop = false;
             // 
             // Main
             // 
@@ -285,5 +380,14 @@
         private CheckBox ckbx_doom_Beep;
         private Button btn_resetDoom;
         private PictureBox pb_bosshp;
+        private Label label6;
+        private Label label7;
+        private Label label8;
+        private Label label9;
+        private TextBox hp_br_y;
+        private TextBox hp_tl_y;
+        private TextBox hp_br_x;
+        private Label label10;
+        private TextBox hp_tl_x;
     }
 }

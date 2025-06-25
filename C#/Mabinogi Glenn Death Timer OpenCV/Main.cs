@@ -63,7 +63,8 @@ namespace Mabi_CV
         private void Boss_HP_Monitor()
         {
             OCR reader = new OCR();
-            SubCapture HpBar_cap = new SubCapture(screencap.GetCrop, new OpenCvSharp.Rect(1022, 1250, 1535 - 1022, 1280 - 1250));
+            Utils utils = new Utils();
+            SubCapture HpBar_cap = new SubCapture(screencap.GetCrop, utils.Textboxes_to_Rect(hp_tl_x, hp_tl_y, hp_br_x, hp_br_y));
             while (true)
             {
                 Thread.Sleep(33);
@@ -76,8 +77,10 @@ namespace Mabi_CV
         {
             Mat mask = new Mat();
             OCR reader = new OCR();
-
-            SubCapture DoomWindow_Cap = new SubCapture(screencap.GetCrop ,new OpenCvSharp.Rect(2170, 160, 2560 - 2170, 318 - 160));
+            Utils utils = new Utils();
+            
+            
+            SubCapture DoomWindow_Cap = new SubCapture(screencap.GetCrop , utils.Textboxes_to_Rect(doom_tl_x, doom_tl_y, doom_br_x, doom_br_y));
 
             string output;
             Taylors_Countdown_Timer FirstTry = new Taylors_Countdown_Timer(10);
@@ -92,7 +95,7 @@ namespace Mabi_CV
                 mask = DoomWindow_Cap.Crop.Clone();
                 Cv2.Resize(mask, mask, new OpenCvSharp.Size(mask.Width * 3, mask.Height * 3));
 
-                DoomWindow_Cap.CorrectGamma(mask, mask, .3);
+                utils.CorrectGamma(mask, mask, .3);
 
                 Cv2.CvtColor(mask, mask, ColorConversionCodes.BGR2HSV);
                 Cv2.InRange(mask, new Scalar(0, 0, 210), new Scalar(180, 100, 255), mask);
@@ -175,7 +178,7 @@ namespace Mabi_CV
 
                     //lets check if the time rerecognitions is close to the name rerecognitions. if its less we probably did not read the time in right the first time
                     //we dont care the other way around really because we are filtering out poorly read names before this seciton of code. so inherently all the names in this list should be pretty accurate
-                    if(org_timer.Rerecognition_Count_Name * 0.8 < org_timer.Rerecognition_Count_Time)
+                    if(org_timer.Rerecognition_Count_Name * 0.9 < org_timer.Rerecognition_Count_Time)
                     {
                         fresh.Remove(fresh_timer);
                         continue;
@@ -195,6 +198,8 @@ namespace Mabi_CV
             //now we add in all of the unused items
             reoccuring.AddRange(fresh);
         }
+
+
 
 
         private void Main_Load(object sender, EventArgs e)

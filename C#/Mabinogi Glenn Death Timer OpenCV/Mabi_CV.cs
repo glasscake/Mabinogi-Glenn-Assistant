@@ -128,6 +128,11 @@ namespace Mabi_CV
        }
        
        
+
+    }
+
+    public class Utils
+    {
         public void CorrectGamma(Mat src, Mat dst, double gamma)
         {
             byte[] lut = new byte[256];
@@ -138,8 +143,20 @@ namespace Mabi_CV
 
             Cv2.LUT(src, lut, dst);
         }
+        public OpenCvSharp.Rect Textboxes_to_Rect(TextBox top_left_x, TextBox top_left_y, TextBox bottom_right_x, TextBox bottom_right_y)
+        {
+            List<TextBox> textboxes = new List<TextBox>() { top_left_x, top_left_y, bottom_right_x, bottom_right_y };
+            List<int> nums = new List<int>();
+            int count = 0;
+            int temp;
+            foreach (TextBox textbox in textboxes)
+            {
+                if (int.TryParse(textbox.Text, out temp) == false) { return new OpenCvSharp.Rect(0, 0, 0, 0); }
+                nums.Add(temp);
+            }
+            return new OpenCvSharp.Rect(nums[0], nums[1], nums[2] - nums[0], nums[3] - nums[1]);
+        }
     }
-
 
     public class OCR
     {
