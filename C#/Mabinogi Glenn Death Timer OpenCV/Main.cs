@@ -22,17 +22,21 @@ namespace Mabi_CV
     public partial class Main : Form
     {
         Thread DoomMonitor;
+        Thread HPMonitor;
+
         List<DoomTimer> timers = new List<DoomTimer>();
         CancellationTokenSource cts_doom = new CancellationTokenSource();
+        CancellationTokenSource cts_HP = new CancellationTokenSource();
         ScreenCapture screencap = new ScreenCapture();
+
+        bool UserInput_Boss_started;
 
 
         public Main()
         {
             InitializeComponent();
-            start_doom_monitor();
-            Thread test = new Thread(() => Boss_HP_Monitor());
-            test.Start();
+            //start_doom_monitor();
+            start_HP_monitor();
         }
 
         private void btn_debugging_Click(object sender, EventArgs e)
@@ -49,7 +53,31 @@ namespace Mabi_CV
             cts_doom.Cancel();
             Stopwatch timeoput = new Stopwatch();
             timeoput.Start();
+            if(DoomMonitor == null) {return; }
             while (DoomMonitor.ThreadState == System.Threading.ThreadState.Running && timeoput.ElapsedMilliseconds < 10 * 1000)
+            {
+
+            }
+        }
+
+        private void start_HP_monitor()
+        {
+            cts_HP = new CancellationTokenSource();
+            Thread HPMonitor = new Thread(() => Boss_HP_Monitor(cts_HP.Token));
+            HPMonitor.Start();
+        }
+        private void reset_HP_monitor()
+        {
+            stop_HP_monitor();
+            start_HP_monitor();
+        }
+        private void stop_HP_monitor()
+        {
+            cts_HP.Cancel();
+            Stopwatch timeoput = new Stopwatch();
+            timeoput.Start();
+            if(HPMonitor == null) { return; }
+            while (HPMonitor.ThreadState == System.Threading.ThreadState.Running && timeoput.ElapsedMilliseconds < 10 * 1000)
             {
 
             }
@@ -60,16 +88,67 @@ namespace Mabi_CV
             DoomMonitor = new Thread(() => DoomParser(cts_doom.Token));
             DoomMonitor.Start();
         }
-        private void Boss_HP_Monitor()
+
+        private void Boss_HP_Monitor(CancellationToken token)
         {
             OCR reader = new OCR();
             Utils utils = new Utils();
-            SubCapture HpBar_cap = new SubCapture(screencap.GetCrop, utils.Textboxes_to_Rect(hp_tl_x, hp_tl_y, hp_br_x, hp_br_y));
+            SubCapture HpBar_subcap = new SubCapture(screencap.GetCrop, utils.Textboxes_to_Rect(hp_tl_x, hp_tl_y, hp_br_x, hp_br_y));
+            Mat Hpbar_mat = new Mat();
+            double BOSS_HP;
+            //bools for if the speach synth already spoke
+            bool p95, p75, p65, p55, p35, p25, p15;
+            //a timeout where if we loose the boss hp bar for too long we reset the app
+            Stopwatch Lost_BOSS_HP = new Stopwatch();
+            Lost_BOSS_HP.Start();
+            int reset_timeout = 240 * 1000;
+            string read_text;
+            Mat maskyellow = new Mat();
+
             while (true)
             {
-                Thread.Sleep(33);
-                pb_bosshp.Invoke(() => pb_bosshp.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(HpBar_cap.Crop));
+                Thread.Sleep(100);
+                if (Lost_BOSS_HP.ElapsedMilliseconds > reset_timeout) { break; }
+                if (token.IsCancellationRequested == true) { break; }
+
+                Hpbar_mat = HpBar_subcap.Crop.Clone();
+                
+
+                utils.CorrectGamma(Hpbar_mat, Hpbar_mat, .5);
+                Cv2.ImShow("gamma", Hpbar_mat);
+                Cv2.Resize(Hpbar_mat, Hpbar_mat, new OpenCvSharp.Size(Hpbar_mat.Width * 2, Hpbar_mat.Height * 2));
+                Cv2.CvtColor(Hpbar_mat, maskyellow, ColorConversionCodes.BGR2HSV);
+                
+                Cv2.InRange(maskyellow, new Scalar(20, 240, 100), new Scalar(24, 255, 255), maskyellow);
+               
+                
+                Cv2.BitwiseNot(maskyellow,maskyellow);
+                Cv2.GaussianBlur(maskyellow, maskyellow, new OpenCvSharp.Size(11, 11), 0);
+                //Cv2.Threshold(maskyellow, maskyellow, 25, 255,ThresholdTypes.Binary);
+                
+
+                Cv2.ImShow("yellowonly", maskyellow);
+                Cv2.CvtColor(Hpbar_mat, Hpbar_mat, ColorConversionCodes.BGR2GRAY);
+                //Cv2.AddWeighted(Hpbar_mat, .9, maskyellow, .5, .5, Hpbar_mat);
+                //Cv2.BitwiseNot(Hpbar_mat,Hpbar_mat);
+                //Cv2.BitwiseAnd(Hpbar_mat,maskyellow,Hpbar_mat);
+
+
+                Cv2.WaitKey(1);
+
+                read_text = reader.Read(OpenCvSharp.Extensions.BitmapConverter.ToBitmap(Hpbar_mat));
+                read_text = read_text.Replace('°', '.');
+
+                //first we need to detect Cailleach and Cnoc Oighir. this will be how we know we started the boss room
+                //or the user can press start to signify they are at the HM section
+                //if (UserInput_Boss_started != true) { continue; }
+
+                
+
+                pb_bosshp.Invoke(() => pb_bosshp.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(Hpbar_mat));
+                richtx_debugging_HP.Invoke(() => richtx_debugging_HP.Text = read_text);
             }
+            Hpbar_mat.Dispose();
         }
 
 
@@ -78,9 +157,9 @@ namespace Mabi_CV
             Mat mask = new Mat();
             OCR reader = new OCR();
             Utils utils = new Utils();
-            
-            
-            SubCapture DoomWindow_Cap = new SubCapture(screencap.GetCrop , utils.Textboxes_to_Rect(doom_tl_x, doom_tl_y, doom_br_x, doom_br_y));
+
+
+            SubCapture DoomWindow_Cap = new SubCapture(screencap.GetCrop, utils.Textboxes_to_Rect(doom_tl_x, doom_tl_y, doom_br_x, doom_br_y));
 
             string output;
             Taylors_Countdown_Timer FirstTry = new Taylors_Countdown_Timer(10);
@@ -113,7 +192,7 @@ namespace Mabi_CV
                 output = "";
                 foreach (DoomTimer timer in timers)
                 {
-                    output = output + timer.Name + " has " + timer.Timer.Time_Remaining.ToString() + " and has reoccured: " + timer.Rerecognition_Count_Name.ToString() + " Timer has reoccured: "+timer.Rerecognition_Count_Time+" \n";
+                    output = output + timer.Name + " has " + timer.Timer.Time_Remaining.ToString() + " and has reoccured: " + timer.Rerecognition_Count_Name.ToString() + " Timer has reoccured: " + timer.Rerecognition_Count_Time + " \n";
                 }
 
                 richtx_debugging.Invoke(() => richtx_debugging.Text = output);
@@ -178,7 +257,7 @@ namespace Mabi_CV
 
                     //lets check if the time rerecognitions is close to the name rerecognitions. if its less we probably did not read the time in right the first time
                     //we dont care the other way around really because we are filtering out poorly read names before this seciton of code. so inherently all the names in this list should be pretty accurate
-                    if(org_timer.Rerecognition_Count_Name * 0.9 < org_timer.Rerecognition_Count_Time)
+                    if (org_timer.Rerecognition_Count_Name * 0.9 < org_timer.Rerecognition_Count_Time)
                     {
                         fresh.Remove(fresh_timer);
                         continue;
@@ -210,6 +289,16 @@ namespace Mabi_CV
         private void btn_resetDoom_Click(object sender, EventArgs e)
         {
             reset_doom_monitor();
+        }
+
+        private void btn_startBoss_Click(object sender, EventArgs e)
+        {
+            UserInput_Boss_started = true;
+        }
+
+        private void btn_ResetHP_Click(object sender, EventArgs e)
+        {
+            reset_HP_monitor();
         }
     }
 
