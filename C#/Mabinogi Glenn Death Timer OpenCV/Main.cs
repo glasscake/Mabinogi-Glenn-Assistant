@@ -110,7 +110,7 @@ namespace Mabi_CV
                 output = "";
                 foreach (DoomTimer timer in timers)
                 {
-                    output = output + timer.Name + " has " + timer.Timer.Time_Remaining.ToString() + " and has reoccured" + timer.Rerecognition_Count.ToString() + " \n";
+                    output = output + timer.Name + " has " + timer.Timer.Time_Remaining.ToString() + " and has reoccured: " + timer.Rerecognition_Count_Name.ToString() + " Timer has reoccured: "+timer.Rerecognition_Count_Time+" \n";
                 }
 
                 richtx_debugging.Invoke(() => richtx_debugging.Text = output);
@@ -132,12 +132,12 @@ namespace Mabi_CV
             int maxcount = 0;
             if (reoccuring.Count > 0)
             {
-                maxcount = reoccuring.Select(item => item.Rerecognition_Count).Max();
+                maxcount = reoccuring.Select(item => item.Rerecognition_Count_Name).Max();
             }
             if (reoccuring.Count >= 4 && maxcount > 25)
             {
                 //now get rid of any that are not close to the max count
-                reoccuring.RemoveAll(item => item.Rerecognition_Count < maxcount * 0.5);
+                reoccuring.RemoveAll(item => item.Rerecognition_Count_Name < maxcount * 0.5);
                 reoccuring.ForEach(item => item.Change_Beep(ckbx_doom_Beep.Checked));
                 reoccuring.ForEach(item => item.Change_voice(ckbx_doomVoice.Checked));
             }
@@ -157,19 +157,43 @@ namespace Mabi_CV
             {
                 foreach (DoomTimer fresh_timer in fresh.ToList())
                 {
-                    if (LevenshteinDistance.Compute(fresh_timer.Name, org_timer.Name) <= 2)
+                    if (LevenshteinDistance.Compute(fresh_timer.Name, org_timer.Name) >= 3)
                     {
-                        org_timer.Rerecognition_Count++;
-                        fresh.Remove(fresh_timer);
+                        continue;
                     }
+                    //ok we had a name match with less than 3 characters different increment the reoccurance counter
+                    org_timer.Rerecognition_Count_Name++;
+                    //lets check if the timer is being read correctly
+                    int org_time, fresh_time;
+                    org_time = org_timer.Timer.Time_Remaining;
+                    fresh_time = fresh_timer.Timer.Time_Remaining;
+                    //so we are going to check if we are within a 4 second window of the original timer. by adding 2 to the time and seeing if it is greater than the new time and vise versa
+                    if (org_time + 2 > fresh_time && org_time - 2 < fresh_time)
+                    {
+                        org_timer.Rerecognition_Count_Time++;
+                    }
+
+                    //lets check if the time rerecognitions is close to the name rerecognitions. if its less we probably did not read the time in right the first time
+                    //we dont care the other way around really because we are filtering out poorly read names before this seciton of code. so inherently all the names in this list should be pretty accurate
+                    if(org_timer.Rerecognition_Count_Name * 0.8 < org_timer.Rerecognition_Count_Time)
+                    {
+                        fresh.Remove(fresh_timer);
+                        continue;
+                    }
+
+                    //check if the timer is siginificantly greater than what it was. this means someone was in the portal
+                    if (org_time + 10 < fresh_time || org_time - 5 > fresh_time)
+                    {
+                        //we are reading the new capture as longer than the original capture. lets recalculate out the time
+                        org_timer.Timer.startingtime += fresh_time - org_time;
+                        //reset the difference in counting so we are not constatnly recalculating the time
+                        org_timer.Rerecognition_Count_Time = org_timer.Rerecognition_Count_Name;
+                    }
+                    fresh.Remove(fresh_timer);
                 }
             }
             //now we add in all of the unused items
             reoccuring.AddRange(fresh);
-
-
-
-
         }
 
 

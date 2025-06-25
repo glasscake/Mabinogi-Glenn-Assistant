@@ -344,7 +344,8 @@ namespace Mabi_CV
         public bool Enable_speach;
         private bool spoke = false;
         public string Error;
-        public int Rerecognition_Count;
+        public int Rerecognition_Count_Name;
+        public int Rerecognition_Count_Time;
         Thread monitor;
         private CancellationTokenSource cts = new CancellationTokenSource();
         public DoomTimer(string error)
