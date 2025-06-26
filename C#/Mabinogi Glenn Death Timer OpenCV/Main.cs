@@ -112,8 +112,8 @@ namespace Mabi_CV
                 if (Lost_BOSS_HP.ElapsedMilliseconds > reset_timeout) { break; }
                 if (token.IsCancellationRequested == true) { break; }
 
-                //Hpbar_mat = HpBar_subcap.Crop.Clone();
-                Hpbar_mat = Cv2.ImRead("Refrences/bosshp/bosshp.jpg");
+                Hpbar_mat = HpBar_subcap.Crop.Clone();
+                //Hpbar_mat = Cv2.ImRead("Refrences/bosshp/bosshp.jpg");
 
                 utils.CorrectGamma(Hpbar_mat, Hpbar_mat, .5);
                 Cv2.ImShow("gamma", Hpbar_mat);
@@ -127,6 +127,11 @@ namespace Mabi_CV
                 Cv2.CvtColor(Hpbar_mat, Hpbar_mat, ColorConversionCodes.BGR2GRAY);
                 Mat m1 = new Mat();
                 Cv2.AddWeighted(Hpbar_mat, 1, m0, -.4, 0, m1);
+                Cv2.Threshold(m1, m1, 150, 255,ThresholdTypes.Binary);
+                var kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(2, 2), new OpenCvSharp.Point(-1, -1));
+                Cv2.Dilate(m1, m1, kernel,iterations: 3);
+                //Cv2.GaussianBlur(m1, m1, new OpenCvSharp.Size(3, 3), 1);
+
                 Cv2.ImShow("dif", m1 );
                 Cv2.ImShow("hp", Hpbar_mat);
 

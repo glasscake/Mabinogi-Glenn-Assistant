@@ -191,7 +191,7 @@
             hp_tl_x.Name = "hp_tl_x";
             hp_tl_x.Size = new Size(100, 23);
             hp_tl_x.TabIndex = 10;
-            hp_tl_x.Text = "1400";
+            hp_tl_x.Text = "1450";
             // 
             // label5
             // 
