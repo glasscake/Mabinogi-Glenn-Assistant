@@ -53,7 +53,7 @@ namespace Mabi_CV
             cts_doom.Cancel();
             Stopwatch timeoput = new Stopwatch();
             timeoput.Start();
-            if(DoomMonitor == null) {return; }
+            if (DoomMonitor == null) { return; }
             while (DoomMonitor.ThreadState == System.Threading.ThreadState.Running && timeoput.ElapsedMilliseconds < 10 * 1000)
             {
 
@@ -76,7 +76,7 @@ namespace Mabi_CV
             cts_HP.Cancel();
             Stopwatch timeoput = new Stopwatch();
             timeoput.Start();
-            if(HPMonitor == null) { return; }
+            if (HPMonitor == null) { return; }
             while (HPMonitor.ThreadState == System.Threading.ThreadState.Running && timeoput.ElapsedMilliseconds < 10 * 1000)
             {
 
@@ -103,7 +103,8 @@ namespace Mabi_CV
             Lost_BOSS_HP.Start();
             int reset_timeout = 240 * 1000;
             string read_text;
-            Mat maskyellow = new Mat();
+            Mat m0 = new Mat();
+
 
             while (true)
             {
@@ -111,41 +112,36 @@ namespace Mabi_CV
                 if (Lost_BOSS_HP.ElapsedMilliseconds > reset_timeout) { break; }
                 if (token.IsCancellationRequested == true) { break; }
 
-                Hpbar_mat = HpBar_subcap.Crop.Clone();
-                
+                //Hpbar_mat = HpBar_subcap.Crop.Clone();
+                Hpbar_mat = Cv2.ImRead("Refrences/bosshp/bosshp.jpg");
 
                 utils.CorrectGamma(Hpbar_mat, Hpbar_mat, .5);
                 Cv2.ImShow("gamma", Hpbar_mat);
                 Cv2.Resize(Hpbar_mat, Hpbar_mat, new OpenCvSharp.Size(Hpbar_mat.Width * 2, Hpbar_mat.Height * 2));
-                Cv2.CvtColor(Hpbar_mat, maskyellow, ColorConversionCodes.BGR2HSV);
-                
-                Cv2.InRange(maskyellow, new Scalar(20, 240, 100), new Scalar(24, 255, 255), maskyellow);
-               
-                
-                Cv2.BitwiseNot(maskyellow,maskyellow);
-                Cv2.GaussianBlur(maskyellow, maskyellow, new OpenCvSharp.Size(11, 11), 0);
-                //Cv2.Threshold(maskyellow, maskyellow, 25, 255,ThresholdTypes.Binary);
-                
+                Cv2.CvtColor(Hpbar_mat, m0, ColorConversionCodes.BGR2HSV);
 
-                Cv2.ImShow("yellowonly", maskyellow);
+                Cv2.InRange(m0, new Scalar(18, 150, 100), new Scalar(26, 255, 255), m0);
+                Cv2.GaussianBlur(m0,m0,new OpenCvSharp.Size(5,5),0);
+
+                Cv2.ImShow("colors only", m0);
                 Cv2.CvtColor(Hpbar_mat, Hpbar_mat, ColorConversionCodes.BGR2GRAY);
-                //Cv2.AddWeighted(Hpbar_mat, .9, maskyellow, .5, .5, Hpbar_mat);
-                //Cv2.BitwiseNot(Hpbar_mat,Hpbar_mat);
-                //Cv2.BitwiseAnd(Hpbar_mat,maskyellow,Hpbar_mat);
-
+                Mat m1 = new Mat();
+                Cv2.AddWeighted(Hpbar_mat, 1, m0, -.4, 0, m1);
+                Cv2.ImShow("dif", m1 );
+                Cv2.ImShow("hp", Hpbar_mat);
 
                 Cv2.WaitKey(1);
 
-                read_text = reader.Read(OpenCvSharp.Extensions.BitmapConverter.ToBitmap(Hpbar_mat));
+                read_text = reader.Read(OpenCvSharp.Extensions.BitmapConverter.ToBitmap(m1));
                 read_text = read_text.Replace('°', '.');
 
                 //first we need to detect Cailleach and Cnoc Oighir. this will be how we know we started the boss room
                 //or the user can press start to signify they are at the HM section
                 //if (UserInput_Boss_started != true) { continue; }
 
-                
 
-                pb_bosshp.Invoke(() => pb_bosshp.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(Hpbar_mat));
+
+                pb_bosshp.Invoke(() => pb_bosshp.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(m1));
                 richtx_debugging_HP.Invoke(() => richtx_debugging_HP.Text = read_text);
             }
             Hpbar_mat.Dispose();
@@ -299,6 +295,13 @@ namespace Mabi_CV
         private void btn_ResetHP_Click(object sender, EventArgs e)
         {
             reset_HP_monitor();
+        }
+
+        private void btn_debug_Click(object sender, EventArgs e)
+        {
+            Utils utils = new Utils();
+            SubCapture HpBar_subcap = new SubCapture(screencap.GetCrop, utils.Textboxes_to_Rect(hp_tl_x, hp_tl_y, hp_br_x, hp_br_y));
+            HpBar_subcap.Crop_Image.Save("t.jpg");
         }
     }
 

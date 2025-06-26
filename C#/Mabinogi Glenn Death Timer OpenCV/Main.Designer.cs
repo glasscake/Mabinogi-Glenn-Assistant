@@ -52,6 +52,7 @@
             tc_main = new TabControl();
             tp_main = new TabPage();
             tp_debug = new TabPage();
+            btn_debug = new Button();
             richtx_debugging_HP = new RichTextBox();
             btn_startBoss = new Button();
             btn_ResetHP = new Button();
@@ -292,6 +293,7 @@
             // 
             // tp_debug
             // 
+            tp_debug.Controls.Add(btn_debug);
             tp_debug.Controls.Add(richtx_debugging_HP);
             tp_debug.Controls.Add(btn_startBoss);
             tp_debug.Controls.Add(btn_ResetHP);
@@ -317,17 +319,27 @@
             tp_debug.Text = "Debugging";
             tp_debug.UseVisualStyleBackColor = true;
             // 
+            // btn_debug
+            // 
+            btn_debug.Location = new Point(1355, 559);
+            btn_debug.Name = "btn_debug";
+            btn_debug.Size = new Size(75, 59);
+            btn_debug.TabIndex = 20;
+            btn_debug.Text = "button1";
+            btn_debug.UseVisualStyleBackColor = true;
+            btn_debug.Click += btn_debug_Click;
+            // 
             // richtx_debugging_HP
             // 
             richtx_debugging_HP.Location = new Point(656, 406);
             richtx_debugging_HP.Name = "richtx_debugging_HP";
-            richtx_debugging_HP.Size = new Size(498, 92);
+            richtx_debugging_HP.Size = new Size(498, 333);
             richtx_debugging_HP.TabIndex = 19;
             richtx_debugging_HP.Text = "";
             // 
             // btn_startBoss
             // 
-            btn_startBoss.Location = new Point(338, 542);
+            btn_startBoss.Location = new Point(1410, 624);
             btn_startBoss.Name = "btn_startBoss";
             btn_startBoss.Size = new Size(165, 93);
             btn_startBoss.TabIndex = 18;
@@ -433,7 +445,7 @@
             // 
             pb_bosshp.Location = new Point(26, 406);
             pb_bosshp.Name = "pb_bosshp";
-            pb_bosshp.Size = new Size(624, 92);
+            pb_bosshp.Size = new Size(624, 333);
             pb_bosshp.SizeMode = PictureBoxSizeMode.Zoom;
             pb_bosshp.TabIndex = 9;
             pb_bosshp.TabStop = false;
@@ -531,5 +543,6 @@
         private Button btn_startBoss;
         private Button btn_ResetHP;
         private RichTextBox richtx_debugging_HP;
+        private Button btn_debug;
     }
 }
