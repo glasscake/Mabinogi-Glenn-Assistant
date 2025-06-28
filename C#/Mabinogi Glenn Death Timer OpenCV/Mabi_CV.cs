@@ -409,6 +409,7 @@ namespace Mabi_CV
         {
             while (Timer.Time_Remaining != 0 && (Enable_beep == true || Enable_speach == true) && token.IsCancellationRequested == false)
             {
+                Thread.Sleep(500);
                 if (Timer.Time_Remaining < 30 && Enable_beep == true && beeped == false)
                 {
                     Console.Beep(400, 500);

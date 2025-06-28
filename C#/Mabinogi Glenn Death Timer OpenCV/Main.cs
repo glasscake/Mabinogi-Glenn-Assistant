@@ -98,13 +98,18 @@ namespace Mabi_CV
 
             double Boss_HP;
             double Boss_HP_doubleCheckRead = 0;
+            double Boss_HP_average=0;
             List<double> Boss_hp_history = new List<double>(); 
 
 
             //bools for if the speach synth already spoke
-            bool p95, p75, p65, p55, p35, p25, p15;
+            bool p95 = false, p75 = false, p65 = false, p55 = false, p35 = false, p25 = false, p15 = false;
+           
             //a timeout where if we loose the boss hp bar for too long we reset the app
             Stopwatch Lost_BOSS_HP = new Stopwatch();
+            Stopwatch zero_percent = new Stopwatch();
+            Stopwatch runtime = new Stopwatch();
+            int ms_since_last_success = 0;
             Lost_BOSS_HP.Start();
             int reset_timeout = 240 * 1000;
             string read_text;
@@ -113,11 +118,33 @@ namespace Mabi_CV
             Regex reg_hp_percent = new Regex(@"\d?\d.\d\d %");
             Regex reg_hp = new Regex(@"\d?\d.\d\d");
 
+            SpeechSynthesizer synth = new SpeechSynthesizer();
+
+            List<CheckBox> ckcbox_anoucments = new List<CheckBox>() {ckbx_95, ckbx_75, ckbx_65, ckbx_55, ckbx_35, ckbx_25, ckbx_15};
+            
+            runtime.Start();
             while (true)
             {
-                Thread.Sleep(200);
+                Thread.Sleep(100);
+
+                if (UserInput_Boss_started != true) { continue; }
+
                 if (Lost_BOSS_HP.ElapsedMilliseconds > reset_timeout) { break; }
                 if (token.IsCancellationRequested == true) { break; }
+
+                try { Boss_HP_average = Boss_hp_history.Average(); }
+                catch { Boss_HP_average = 100; }
+
+                try
+                {
+                    if (Boss_HP_average == 0)
+                    {
+                        zero_percent.Start();
+                    }
+                    if (Boss_HP_average == 0 && zero_percent.ElapsedMilliseconds > 30 * 1000) { break; }
+                }
+                catch (Exception e) { }
+
 
                 mat_hp = HpBar_subcap.Crop.Clone();
                 //mat_hp = Cv2.ImRead("Refrences/bosshp/bosshp.jpg");
@@ -137,20 +164,22 @@ namespace Mabi_CV
 
                 if(double.TryParse(match.Value, out Boss_HP) == false) { continue; }
 
+                if(Boss_HP > 100) { continue; }
+
                 #region check for failed hitcheck
                 //are we seeing a large jump between the newest value and the last value without a big time difference
                 //are we jumping up in hp? this should only happen if hitcheck was failed so the HP is going form 65 to 75 or 35 to 45
                 try
                     {
                     if (
-                        Boss_HP > Boss_hp_history.Average() &&                                                   //is the new hp larger than the average
+                        Boss_HP > Boss_HP_average &&                                                   //is the new hp larger than the average
                         ((Boss_HP > 80.0 && Boss_HP < 85.1) || (Boss_HP > 40.0 && Boss_HP < 45.1)) &&           //is the new hp close to 75% or 45%
-                        ((Boss_hp_history.Average() > 75 && Boss_hp_history.Average() < 77) || (Boss_hp_history.Average() > 35 && Boss_hp_history.Average() < 37))//was the average close to  65 or 35
+                        ((Boss_HP_average > 75 && Boss_HP_average < 77) || (Boss_HP_average > 35 && Boss_HP_average < 37))//was the average close to  65 or 35
                         && !(Boss_HP >= Boss_HP_doubleCheckRead - 0.5 && Boss_HP <= Boss_HP_doubleCheckRead + 0.5) //have we already checked this?
                         )
                     {
                         //everything lines up with a failed hit check, lets wait a moment read again and see if the hp stays consistent
-                        Thread.Sleep(1500);
+                        Thread.Sleep(5500);
                         Boss_HP_doubleCheckRead = Boss_HP;
                         continue;
                     }
@@ -168,6 +197,14 @@ namespace Mabi_CV
                 catch (Exception) { Console.WriteLine("exception when testing for failed hitcheck"); }
                 #endregion
 
+                //check for large deltas in short times
+                //because certain numbers can be miss read rappidly like 78 being read as 73
+                
+                if(Math.Abs(Boss_HP - Boss_HP_average) > (Lost_BOSS_HP.ElapsedMilliseconds / 100))
+                {
+                    continue;
+                }
+
                 Boss_hp_history.Add(Boss_HP);
 
                 if (Boss_hp_history.Count > 10)
@@ -175,22 +212,47 @@ namespace Mabi_CV
                     Boss_hp_history.RemoveAt(0);
                 }
 
-                Boss_HP = Boss_hp_history.Average();
+                Boss_HP = Boss_HP_average;
 
 
-
-
-
-                //first we need to detect Cailleach and Cnoc Oighir. this will be how we know we started the boss room
-                //or the user can press start to signify they are at the HM section
-                //if (UserInput_Boss_started != true) { continue; }
+                //Check if we need to make an annoucement
+                if(AnnoucmentCheck(ref p95, ckbx_95.Checked, 95, 98, Boss_HP, synth, "Day Lights, Night Doom, Night Chill") == true)
+                {
+                    start_doom_monitor();
+                }
+                if(AnnoucmentCheck(ref p75, ckbx_75.Checked, 75, 78, Boss_HP, synth, "Hit Check") == true)
+                {
+                    stop_doom_monitor() ;
+                }
+                AnnoucmentCheck(ref p65, ckbx_65.Checked, 65, 68, Boss_HP, synth, "Night Swords");
+                if(AnnoucmentCheck(ref p55, ckbx_55.Checked, 55, 58, Boss_HP, synth, "Swap, Night Lights, Day Doom, Day Chill") == true)
+                {
+                    start_doom_monitor();
+                }
+                if(AnnoucmentCheck(ref p35, ckbx_35.Checked, 35, 38, Boss_HP, synth, "Hit Check") == true)
+                {
+                    stop_doom_monitor() ;
+                }
+                AnnoucmentCheck(ref p25, ckbx_25.Checked, 25, 28, Boss_HP, synth, "Day Swords");
+                AnnoucmentCheck(ref p15, ckbx_15.Checked, 15, 18, Boss_HP, synth, "Group");
 
 
                 Lost_BOSS_HP.Restart();
                 pb_bosshp.Invoke(() => pb_bosshp.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(mat_hp));
                 richtx_debugging_HP.Invoke(() => richtx_debugging_HP.Text = Boss_HP.ToString());
             }
+            runtime.Stop();
             mat_hp.Dispose();
+        }
+
+        private bool AnnoucmentCheck(ref bool done,bool enabled, double min, double max, double input, SpeechSynthesizer synth, string anouncement)
+        {
+            if(enabled == false) { return false; }
+            if(done == true) { return false; }
+            if( (input > min && input < max) == false) {  return false; }
+            synth.Speak(anouncement);
+            done = true;
+            return true;
         }
 
         private Mat BossHp_Filtering(Mat input)
@@ -227,8 +289,7 @@ namespace Mabi_CV
             Mat mask = new Mat();
             OCR reader = new OCR();
             Utils utils = new Utils();
-
-
+            int wait_time = 15;
             SubCapture DoomWindow_Cap = new SubCapture(screencap.GetCrop, utils.Textboxes_to_Rect(doom_tl_x, doom_tl_y, doom_br_x, doom_br_y));
 
             string output;
@@ -239,7 +300,7 @@ namespace Mabi_CV
                 {
                     break;
                 }
-                Thread.Sleep(15);
+                Thread.Sleep(wait_time);
 
                 mask = DoomWindow_Cap.Crop.Clone();
                 Cv2.Resize(mask, mask, new OpenCvSharp.Size(mask.Width * 3, mask.Height * 3));
@@ -259,6 +320,14 @@ namespace Mabi_CV
                 output = reader.Read(OpenCvSharp.Extensions.BitmapConverter.ToBitmap(mask));
                 List<DoomTimer> reader_timers = reader.ParseDoom(output);
                 Cull_DoomTimer_List(reader_timers, ref timers);
+                try
+                {
+                    if (timers.Count == 4 && timers[0].Rerecognition_Count_Name > 50)
+                    {
+                        wait_time = 500;
+                    }
+                }
+                catch { }
                 output = "";
                 foreach (DoomTimer timer in timers)
                 {
