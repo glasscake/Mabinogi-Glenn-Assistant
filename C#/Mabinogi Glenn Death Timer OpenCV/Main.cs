@@ -94,8 +94,13 @@ namespace Mabi_CV
             OCR reader = new OCR();
             Utils utils = new Utils();
             SubCapture HpBar_subcap = new SubCapture(screencap.GetCrop, utils.Textboxes_to_Rect(hp_tl_x, hp_tl_y, hp_br_x, hp_br_y));
-            Mat Hpbar_mat = new Mat();
-            double BOSS_HP;
+            Mat mat_hp = new Mat();
+
+            double Boss_HP;
+            double Boss_HP_doubleCheckRead = 0;
+            List<double> Boss_hp_history = new List<double>(); 
+
+
             //bools for if the speach synth already spoke
             bool p95, p75, p65, p55, p35, p25, p15;
             //a timeout where if we loose the boss hp bar for too long we reset the app
@@ -103,55 +108,119 @@ namespace Mabi_CV
             Lost_BOSS_HP.Start();
             int reset_timeout = 240 * 1000;
             string read_text;
-            Mat m0 = new Mat();
+            List<(char,char)> replace_list = new List<(char,char)> { ('°', '.'), (',', '.') };
 
+            Regex reg_hp_percent = new Regex(@"\d?\d.\d\d %");
+            Regex reg_hp = new Regex(@"\d?\d.\d\d");
 
             while (true)
             {
-                Thread.Sleep(100);
+                Thread.Sleep(200);
                 if (Lost_BOSS_HP.ElapsedMilliseconds > reset_timeout) { break; }
                 if (token.IsCancellationRequested == true) { break; }
 
-                Hpbar_mat = HpBar_subcap.Crop.Clone();
-                //Hpbar_mat = Cv2.ImRead("Refrences/bosshp/bosshp.jpg");
+                mat_hp = HpBar_subcap.Crop.Clone();
+                //mat_hp = Cv2.ImRead("Refrences/bosshp/bosshp.jpg");
 
-                utils.CorrectGamma(Hpbar_mat, Hpbar_mat, .5);
-                Cv2.ImShow("gamma", Hpbar_mat);
-                Cv2.Resize(Hpbar_mat, Hpbar_mat, new OpenCvSharp.Size(Hpbar_mat.Width * 2, Hpbar_mat.Height * 2));
-                Cv2.CvtColor(Hpbar_mat, m0, ColorConversionCodes.BGR2HSV);
+                mat_hp = BossHp_Filtering(mat_hp);
 
-                Cv2.InRange(m0, new Scalar(18, 150, 100), new Scalar(26, 255, 255), m0);
-                Cv2.GaussianBlur(m0,m0,new OpenCvSharp.Size(5,5),0);
+                read_text = reader.Read(OpenCvSharp.Extensions.BitmapConverter.ToBitmap(mat_hp));
+                
+                read_text = StringReplace_List(read_text, replace_list);
+                read_text = Regex.Replace(read_text, @"\n","");
 
-                Cv2.ImShow("colors only", m0);
-                Cv2.CvtColor(Hpbar_mat, Hpbar_mat, ColorConversionCodes.BGR2GRAY);
-                Mat m1 = new Mat();
-                Cv2.AddWeighted(Hpbar_mat, 1, m0, -.4, 0, m1);
-                Cv2.Threshold(m1, m1, 150, 255,ThresholdTypes.Binary);
-                var kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(2, 2), new OpenCvSharp.Point(-1, -1));
-                Cv2.Dilate(m1, m1, kernel,iterations: 3);
-                //Cv2.GaussianBlur(m1, m1, new OpenCvSharp.Size(3, 3), 1);
+                if (reg_hp_percent.IsMatch(read_text) == false) { continue; }
 
-                Cv2.ImShow("dif", m1 );
-                Cv2.ImShow("hp", Hpbar_mat);
+                //remove out the %
+                Match match = reg_hp.Match(read_text); 
+                
 
-                Cv2.WaitKey(1);
+                if(double.TryParse(match.Value, out Boss_HP) == false) { continue; }
 
-                read_text = reader.Read(OpenCvSharp.Extensions.BitmapConverter.ToBitmap(m1));
-                read_text = read_text.Replace('°', '.');
+                #region check for failed hitcheck
+                //are we seeing a large jump between the newest value and the last value without a big time difference
+                //are we jumping up in hp? this should only happen if hitcheck was failed so the HP is going form 65 to 75 or 35 to 45
+                try
+                    {
+                    if (
+                        Boss_HP > Boss_hp_history.Average() &&                                                   //is the new hp larger than the average
+                        ((Boss_HP > 80.0 && Boss_HP < 85.1) || (Boss_HP > 40.0 && Boss_HP < 45.1)) &&           //is the new hp close to 75% or 45%
+                        ((Boss_hp_history.Average() > 75 && Boss_hp_history.Average() < 77) || (Boss_hp_history.Average() > 35 && Boss_hp_history.Average() < 37))//was the average close to  65 or 35
+                        && !(Boss_HP >= Boss_HP_doubleCheckRead - 0.5 && Boss_HP <= Boss_HP_doubleCheckRead + 0.5) //have we already checked this?
+                        )
+                    {
+                        //everything lines up with a failed hit check, lets wait a moment read again and see if the hp stays consistent
+                        Thread.Sleep(1500);
+                        Boss_HP_doubleCheckRead = Boss_HP;
+                        continue;
+                    }
+
+                    //did the hitcheck fail? reset the average and anouncers
+                    if (Boss_HP >= Boss_HP_doubleCheckRead - 1 && Boss_HP <= Boss_HP_doubleCheckRead + 1)
+                    {
+                        Boss_HP_doubleCheckRead = 0;
+                        //reset the hitcheck anouncement
+                        if (Math.Abs(Boss_HP - 85) < 8) { p75 = false; }
+                        if (Math.Abs(Boss_HP - 45) < 8) { p35 = false; }
+                        Boss_hp_history.Clear();
+                    }
+                }
+                catch (Exception) { Console.WriteLine("exception when testing for failed hitcheck"); }
+                #endregion
+
+                Boss_hp_history.Add(Boss_HP);
+
+                if (Boss_hp_history.Count > 10)
+                {
+                    Boss_hp_history.RemoveAt(0);
+                }
+
+                Boss_HP = Boss_hp_history.Average();
+
+
+
+
 
                 //first we need to detect Cailleach and Cnoc Oighir. this will be how we know we started the boss room
                 //or the user can press start to signify they are at the HM section
                 //if (UserInput_Boss_started != true) { continue; }
 
 
-
-                pb_bosshp.Invoke(() => pb_bosshp.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(m1));
-                richtx_debugging_HP.Invoke(() => richtx_debugging_HP.Text = read_text);
+                Lost_BOSS_HP.Restart();
+                pb_bosshp.Invoke(() => pb_bosshp.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(mat_hp));
+                richtx_debugging_HP.Invoke(() => richtx_debugging_HP.Text = Boss_HP.ToString());
             }
-            Hpbar_mat.Dispose();
+            mat_hp.Dispose();
         }
 
+        private Mat BossHp_Filtering(Mat input)
+        {
+            Mat m0 = new Mat();
+            Utils utils = new Utils();
+            utils.CorrectGamma(input, input, .5);
+            //Cv2.ImShow("gamma", input);
+            Cv2.Resize(input, input, new OpenCvSharp.Size(input.Width * 2, input.Height * 2));
+            Cv2.CvtColor(input, m0, ColorConversionCodes.BGR2HSV);
+            Cv2.InRange(m0, new Scalar(18, 150, 100), new Scalar(26, 255, 255), m0);
+            Cv2.GaussianBlur(m0, m0, new OpenCvSharp.Size(5, 5), 0);
+            //Cv2.ImShow("colors only", m0);
+            Cv2.CvtColor(input, input, ColorConversionCodes.BGR2GRAY);
+            Cv2.AddWeighted(input, 1, m0, -.4, 0, input);
+            Cv2.Threshold(input, input, 150, 255, ThresholdTypes.Binary);
+            var kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(2, 2), new OpenCvSharp.Point(-1, -1));
+            Cv2.Dilate(input, input, kernel, iterations: 3);
+            m0.Dispose();
+            return input;
+        }
+
+        private string StringReplace_List(string input, List<(char To_replace, char Replace_with)> list)
+        {
+            foreach (var item in list)
+            {
+                input = input.Replace(item.To_replace, item.Replace_with);
+            }
+            return input;
+        }
 
         private void DoomParser(CancellationToken token)
         {
