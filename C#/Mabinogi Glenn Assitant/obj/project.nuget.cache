@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "dgSpecHash": "p9NiZTflSpY=",
+  "success": true,
+  "projectFilePath": "C:\\Checkout\\githubdesktop\\Mabinogi-Glenn-Death-Timer-OpenCV\\C#\\Mabinogi Glenn Assitant\\Mabinogi Glenn Assistant.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\memo\\.nuget\\packages\\hpph\\1.0.0\\hpph.1.0.0.nupkg.sha512",
+    "C:\\Users\\memo\\.nuget\\packages\\microsoft.win32.systemevents\\8.0.0\\microsoft.win32.systemevents.8.0.0.nupkg.sha512",
+    "C:\\Users\\memo\\.nuget\\packages\\opencvsharp4\\4.11.0.20250507\\opencvsharp4.4.11.0.20250507.nupkg.sha512",
+    "C:\\Users\\memo\\.nuget\\packages\\opencvsharp4.extensions\\4.11.0.20250507\\opencvsharp4.extensions.4.11.0.20250507.nupkg.sha512",
+    "C:\\Users\\memo\\.nuget\\packages\\opencvsharp4.runtime.win\\4.11.0.20250507\\opencvsharp4.runtime.win.4.11.0.20250507.nupkg.sha512",
+    "C:\\Users\\memo\\.nuget\\packages\\opencvsharp4.windows\\4.11.0.20250507\\opencvsharp4.windows.4.11.0.20250507.nupkg.sha512",
+    "C:\\Users\\memo\\.nuget\\packages\\screencapture.net\\3.0.0\\screencapture.net.3.0.0.nupkg.sha512",
+    "C:\\Users\\memo\\.nuget\\packages\\screencapture.net.dx11\\3.0.0\\screencapture.net.dx11.3.0.0.nupkg.sha512",
+    "C:\\Users\\memo\\.nuget\\packages\\sharpgen.runtime\\2.1.2-beta\\sharpgen.runtime.2.1.2-beta.nupkg.sha512",
+    "C:\\Users\\memo\\.nuget\\packages\\sharpgen.runtime.com\\2.1.2-beta\\sharpgen.runtime.com.2.1.2-beta.nupkg.sha512",
+    "C:\\Users\\memo\\.nuget\\packages\\system.drawing.common\\8.0.11\\system.drawing.common.8.0.11.nupkg.sha512",
+    "C:\\Users\\memo\\.nuget\\packages\\system.memory\\4.6.3\\system.memory.4.6.3.nupkg.sha512",
+    "C:\\Users\\memo\\.nuget\\packages\\system.reflection.emit\\4.7.0\\system.reflection.emit.4.7.0.nupkg.sha512",
+    "C:\\Users\\memo\\.nuget\\packages\\system.speech\\9.0.6\\system.speech.9.0.6.nupkg.sha512",
+    "C:\\Users\\memo\\.nuget\\packages\\tesseract\\5.2.0\\tesseract.5.2.0.nupkg.sha512",
+    "C:\\Users\\memo\\.nuget\\packages\\tesseract.drawing\\5.2.0\\tesseract.drawing.5.2.0.nupkg.sha512",
+    "C:\\Users\\memo\\.nuget\\packages\\vortice.direct3d11\\3.5.0\\vortice.direct3d11.3.5.0.nupkg.sha512",
+    "C:\\Users\\memo\\.nuget\\packages\\vortice.directx\\3.5.0\\vortice.directx.3.5.0.nupkg.sha512",
+    "C:\\Users\\memo\\.nuget\\packages\\vortice.dxgi\\3.5.0\\vortice.dxgi.3.5.0.nupkg.sha512",
+    "C:\\Users\\memo\\.nuget\\packages\\vortice.mathematics\\1.7.8\\vortice.mathematics.1.7.8.nupkg.sha512"
+  ],
+  "logs": []
+}
