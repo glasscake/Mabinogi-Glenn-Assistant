@@ -8,6 +8,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<AssemblyVersion>1</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
