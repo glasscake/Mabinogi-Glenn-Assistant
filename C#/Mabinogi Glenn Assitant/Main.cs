@@ -109,7 +109,6 @@ namespace Mabi_CV
             Stopwatch Lost_BOSS_HP = new Stopwatch();
             Stopwatch zero_percent = new Stopwatch();
             Stopwatch runtime = new Stopwatch();
-            int ms_since_last_success = 0;
             Lost_BOSS_HP.Start();
             int reset_timeout = 240 * 1000;
             string read_text;
@@ -137,11 +136,11 @@ namespace Mabi_CV
 
                 try
                 {
-                    if (Boss_HP_average == 0)
+                    if (Boss_HP_average <= 0)
                     {
                         zero_percent.Start();
                     }
-                    if (Boss_HP_average == 0 && zero_percent.ElapsedMilliseconds > 30 * 1000) { break; }
+                    if (Boss_HP_average <= 0 && zero_percent.ElapsedMilliseconds > 30 * 1000) { break; }
                 }
                 catch (Exception e) { }
 
@@ -216,25 +215,25 @@ namespace Mabi_CV
 
 
                 //Check if we need to make an annoucement
-                if (AnnoucmentCheck(ref p95, ckbx_95.Checked, 95, 98, Boss_HP, synth, "Day Lights, Night Doom, Night Chill") == true)
+                if (AnnoucmentCheck(ref p95, ckbx_95.Checked, 95, 99, Boss_HP, synth, "Day Lights, Night Doom, Night Chill") == true)
                 {
                     start_doom_monitor();
                 }
-                if (AnnoucmentCheck(ref p75, ckbx_75.Checked, 75, 78, Boss_HP, synth, "Hit Check") == true)
+                if (AnnoucmentCheck(ref p75, ckbx_75.Checked, 75, 80, Boss_HP, synth, "Hit Check") == true)
                 {
                     stop_doom_monitor();
                 }
-                AnnoucmentCheck(ref p65, ckbx_65.Checked, 65, 68, Boss_HP, synth, "Night Swords");
-                if (AnnoucmentCheck(ref p55, ckbx_55.Checked, 55, 58, Boss_HP, synth, "Swap, Night Lights, Day Doom, Day Chill") == true)
+                AnnoucmentCheck(ref p65, ckbx_65.Checked, 65, 70, Boss_HP, synth, "Night Swords");
+                if (AnnoucmentCheck(ref p55, ckbx_55.Checked, 55, 60, Boss_HP, synth, "Swap, Night Lights, Day Doom, Day Chill") == true)
                 {
                     start_doom_monitor();
                 }
-                if (AnnoucmentCheck(ref p35, ckbx_35.Checked, 35, 38, Boss_HP, synth, "Hit Check") == true)
+                if (AnnoucmentCheck(ref p35, ckbx_35.Checked, 35, 40, Boss_HP, synth, "Hit Check") == true)
                 {
                     stop_doom_monitor();
                 }
-                AnnoucmentCheck(ref p25, ckbx_25.Checked, 25, 28, Boss_HP, synth, "Day Swords");
-                AnnoucmentCheck(ref p15, ckbx_15.Checked, 15, 18, Boss_HP, synth, "Group");
+                AnnoucmentCheck(ref p25, ckbx_25.Checked, 25, 30, Boss_HP, synth, "Day Swords");
+                AnnoucmentCheck(ref p15, ckbx_15.Checked, 15, 20, Boss_HP, synth, "Group");
 
 
                 Lost_BOSS_HP.Restart();
@@ -291,6 +290,7 @@ namespace Mabi_CV
             Utils utils = new Utils();
             int wait_time = 15;
             SubCapture DoomWindow_Cap = new SubCapture(screencap.GetCrop, utils.Textboxes_to_Rect(doom_tl_x, doom_tl_y, doom_br_x, doom_br_y));
+            int reoccurance_confidence = 20;
 
             string output;
             Taylors_Countdown_Timer FirstTry = new Taylors_Countdown_Timer(10);
@@ -322,7 +322,7 @@ namespace Mabi_CV
                 Cull_DoomTimer_List(reader_timers, ref timers);
                 try
                 {
-                    if (timers.Count == 4 && timers[0].Rerecognition_Count_Name > 50)
+                    if (timers.Count == 4 && timers[0].Rerecognition_Count_Name > reoccurance_confidence)
                     {
                         wait_time = 500;
                     }
@@ -349,16 +349,18 @@ namespace Mabi_CV
             if (fresh == null) { return; }
             if (fresh.Count == 0) { return; }
 
+            int reoccurance_confidence = 20;
+
             //do we have 4 good names with lots of recognitions
             int maxcount = 0;
             if (reoccuring.Count > 0)
             {
                 maxcount = reoccuring.Select(item => item.Rerecognition_Count_Name).Max();
             }
-            if (reoccuring.Count >= 4 && maxcount > 25)
+            if (reoccuring.Count >= 4 && maxcount > reoccurance_confidence)
             {
                 //now get rid of any that are not close to the max count
-                reoccuring.RemoveAll(item => item.Rerecognition_Count_Name < maxcount * 0.5);
+                reoccuring.RemoveAll(item => item.Rerecognition_Count_Name < maxcount * 0.3);
                 reoccuring.ForEach(item => item.Change_Beep(ckbx_doom_Beep.Checked));
                 reoccuring.ForEach(item => item.Change_voice(ckbx_doomVoice.Checked));
             }
