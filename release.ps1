@@ -6,7 +6,7 @@ param (
 )
 
 
-$appName = "Mabinogi-Glenn-Assistant" 
+$appName = "Mabinogi Glenn Assistant" 
 $projDir = "./C#/Mabinogi Glenn Assitant"
 
 Set-StrictMode -version 2.0
