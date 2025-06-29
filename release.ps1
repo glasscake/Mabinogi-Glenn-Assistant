@@ -6,8 +6,8 @@ param (
 )
 
 
-$appName = "Mabinogi-Glenn-Assistant" # 👈 Replace with your application project name.
-$projDir = "/C#/Mabinogi Glenn Assitant" # 👈 Replace with your project directory (where .csproj resides).
+$appName = "Mabinogi-Glenn-Assistant" 
+$projDir = ".\C#\Mabinogi Glenn Assitant"
 
 Set-StrictMode -version 2.0
 $ErrorActionPreference = "Stop"
