@@ -5,7 +5,7 @@ param (
     [switch]$OnlyBuild=$false
 )
 
-$appName = "Mabinogi Glenn Assistant" # 👈 Replace with your application project name.
+$appName = "Mabinogi-Glenn-Assistant" # 👈 Replace with your application project name.
 $projDir = "/C#/Mabinogi Glenn Assitant" # 👈 Replace with your project directory (where .csproj resides).
 
 Set-StrictMode -version 2.0
