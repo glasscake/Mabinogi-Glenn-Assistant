@@ -98,13 +98,13 @@ namespace Mabi_CV
 
             double Boss_HP;
             double Boss_HP_doubleCheckRead = 0;
-            double Boss_HP_average=0;
-            List<double> Boss_hp_history = new List<double>(); 
+            double Boss_HP_average = 0;
+            List<double> Boss_hp_history = new List<double>();
 
 
             //bools for if the speach synth already spoke
             bool p95 = false, p75 = false, p65 = false, p55 = false, p35 = false, p25 = false, p15 = false;
-           
+
             //a timeout where if we loose the boss hp bar for too long we reset the app
             Stopwatch Lost_BOSS_HP = new Stopwatch();
             Stopwatch zero_percent = new Stopwatch();
@@ -113,24 +113,24 @@ namespace Mabi_CV
             Lost_BOSS_HP.Start();
             int reset_timeout = 240 * 1000;
             string read_text;
-            List<(char,char)> replace_list = new List<(char,char)> { ('°', '.'), (',', '.') };
+            List<(char, char)> replace_list = new List<(char, char)> { ('°', '.'), (',', '.') };
 
             Regex reg_hp_percent = new Regex(@"\d?\d.\d\d %");
             Regex reg_hp = new Regex(@"\d?\d.\d\d");
 
             SpeechSynthesizer synth = new SpeechSynthesizer();
 
-            List<CheckBox> ckcbox_anoucments = new List<CheckBox>() {ckbx_95, ckbx_75, ckbx_65, ckbx_55, ckbx_35, ckbx_25, ckbx_15};
-            
+            List<CheckBox> ckcbox_anoucments = new List<CheckBox>() { ckbx_95, ckbx_75, ckbx_65, ckbx_55, ckbx_35, ckbx_25, ckbx_15 };
+
             runtime.Start();
             while (true)
             {
                 Thread.Sleep(100);
+                
+                if (token.IsCancellationRequested == true) { break; }
 
                 if (UserInput_Boss_started != true) { continue; }
-
                 if (Lost_BOSS_HP.ElapsedMilliseconds > reset_timeout) { break; }
-                if (token.IsCancellationRequested == true) { break; }
 
                 try { Boss_HP_average = Boss_hp_history.Average(); }
                 catch { Boss_HP_average = 100; }
@@ -152,25 +152,25 @@ namespace Mabi_CV
                 mat_hp = BossHp_Filtering(mat_hp);
 
                 read_text = reader.Read(OpenCvSharp.Extensions.BitmapConverter.ToBitmap(mat_hp));
-                
+
                 read_text = StringReplace_List(read_text, replace_list);
-                read_text = Regex.Replace(read_text, @"\n","");
+                read_text = Regex.Replace(read_text, @"\n", "");
 
                 if (reg_hp_percent.IsMatch(read_text) == false) { continue; }
 
                 //remove out the %
-                Match match = reg_hp.Match(read_text); 
-                
+                Match match = reg_hp.Match(read_text);
 
-                if(double.TryParse(match.Value, out Boss_HP) == false) { continue; }
 
-                if(Boss_HP > 100) { continue; }
+                if (double.TryParse(match.Value, out Boss_HP) == false) { continue; }
+
+                if (Boss_HP > 100) { continue; }
 
                 #region check for failed hitcheck
                 //are we seeing a large jump between the newest value and the last value without a big time difference
                 //are we jumping up in hp? this should only happen if hitcheck was failed so the HP is going form 65 to 75 or 35 to 45
                 try
-                    {
+                {
                     if (
                         Boss_HP > Boss_HP_average &&                                                   //is the new hp larger than the average
                         ((Boss_HP > 80.0 && Boss_HP < 85.1) || (Boss_HP > 40.0 && Boss_HP < 45.1)) &&           //is the new hp close to 75% or 45%
@@ -199,8 +199,8 @@ namespace Mabi_CV
 
                 //check for large deltas in short times
                 //because certain numbers can be miss read rappidly like 78 being read as 73
-                
-                if(Math.Abs(Boss_HP - Boss_HP_average) > (Lost_BOSS_HP.ElapsedMilliseconds / 100))
+
+                if (Math.Abs(Boss_HP - Boss_HP_average) > (Lost_BOSS_HP.ElapsedMilliseconds / 100))
                 {
                     continue;
                 }
@@ -216,22 +216,22 @@ namespace Mabi_CV
 
 
                 //Check if we need to make an annoucement
-                if(AnnoucmentCheck(ref p95, ckbx_95.Checked, 95, 98, Boss_HP, synth, "Day Lights, Night Doom, Night Chill") == true)
+                if (AnnoucmentCheck(ref p95, ckbx_95.Checked, 95, 98, Boss_HP, synth, "Day Lights, Night Doom, Night Chill") == true)
                 {
                     start_doom_monitor();
                 }
-                if(AnnoucmentCheck(ref p75, ckbx_75.Checked, 75, 78, Boss_HP, synth, "Hit Check") == true)
+                if (AnnoucmentCheck(ref p75, ckbx_75.Checked, 75, 78, Boss_HP, synth, "Hit Check") == true)
                 {
-                    stop_doom_monitor() ;
+                    stop_doom_monitor();
                 }
                 AnnoucmentCheck(ref p65, ckbx_65.Checked, 65, 68, Boss_HP, synth, "Night Swords");
-                if(AnnoucmentCheck(ref p55, ckbx_55.Checked, 55, 58, Boss_HP, synth, "Swap, Night Lights, Day Doom, Day Chill") == true)
+                if (AnnoucmentCheck(ref p55, ckbx_55.Checked, 55, 58, Boss_HP, synth, "Swap, Night Lights, Day Doom, Day Chill") == true)
                 {
                     start_doom_monitor();
                 }
-                if(AnnoucmentCheck(ref p35, ckbx_35.Checked, 35, 38, Boss_HP, synth, "Hit Check") == true)
+                if (AnnoucmentCheck(ref p35, ckbx_35.Checked, 35, 38, Boss_HP, synth, "Hit Check") == true)
                 {
-                    stop_doom_monitor() ;
+                    stop_doom_monitor();
                 }
                 AnnoucmentCheck(ref p25, ckbx_25.Checked, 25, 28, Boss_HP, synth, "Day Swords");
                 AnnoucmentCheck(ref p15, ckbx_15.Checked, 15, 18, Boss_HP, synth, "Group");
@@ -245,11 +245,11 @@ namespace Mabi_CV
             mat_hp.Dispose();
         }
 
-        private bool AnnoucmentCheck(ref bool done,bool enabled, double min, double max, double input, SpeechSynthesizer synth, string anouncement)
+        private bool AnnoucmentCheck(ref bool done, bool enabled, double min, double max, double input, SpeechSynthesizer synth, string anouncement)
         {
-            if(enabled == false) { return false; }
-            if(done == true) { return false; }
-            if( (input > min && input < max) == false) {  return false; }
+            if (enabled == false) { return false; }
+            if (done == true) { return false; }
+            if ((input > min && input < max) == false) { return false; }
             synth.Speak(anouncement);
             done = true;
             return true;
@@ -422,7 +422,7 @@ namespace Mabi_CV
 
         private void Main_Load(object sender, EventArgs e)
         {
-            Application.OpenForms[0].Location = Screen.AllScreens[1].WorkingArea.Location;
+            //Application.OpenForms[0].Location = Screen.AllScreens[1].WorkingArea.Location;
         }
 
         private void btn_resetDoom_Click(object sender, EventArgs e)
@@ -445,6 +445,16 @@ namespace Mabi_CV
             Utils utils = new Utils();
             SubCapture HpBar_subcap = new SubCapture(screencap.GetCrop, utils.Textboxes_to_Rect(hp_tl_x, hp_tl_y, hp_br_x, hp_br_y));
             HpBar_subcap.Crop_Image.Save("t.jpg");
+        }
+
+        private void Main_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            //cleanup threads and objects
+            timers.ForEach(item => item.Dispose());
+            timers.Clear();
+            cts_doom.Cancel();
+            cts_HP.Cancel();
+            screencap.stop_livestream();
         }
     }
 

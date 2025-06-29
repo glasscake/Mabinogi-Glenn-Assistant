@@ -492,6 +492,7 @@
             Controls.Add(tc_main);
             Name = "Main";
             Text = "Main";
+            FormClosing += Main_FormClosing;
             Load += Main_Load;
             ((System.ComponentModel.ISupportInitialize)pb_debugging).EndInit();
             pnl_Crop.ResumeLayout(false);
