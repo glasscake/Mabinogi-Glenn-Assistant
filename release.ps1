@@ -7,7 +7,7 @@ param (
 
 
 $appName = "Mabinogi-Glenn-Assistant" 
-$projDir = ".\C#\Mabinogi Glenn Assitant"
+$projDir = "./C#/Mabinogi Glenn Assitant"
 
 Set-StrictMode -version 2.0
 $ErrorActionPreference = "Stop"
