@@ -35,8 +35,16 @@ namespace Mabi_CV
         public Main()
         {
             InitializeComponent();
-            //start_doom_monitor();
             start_HP_monitor();
+            Init_Threads();
+        }
+
+        private void Init_Threads()
+        {
+            cts_HP = new CancellationTokenSource();
+            Thread HPMonitor = new Thread(() => Boss_HP_Monitor(cts_HP.Token));
+            cts_doom = new CancellationTokenSource();
+            DoomMonitor = new Thread(() => DoomParser(cts_doom.Token));
         }
 
         private void btn_debugging_Click(object sender, EventArgs e)
@@ -129,7 +137,7 @@ namespace Mabi_CV
                 if (token.IsCancellationRequested == true) { break; }
 
                 if (UserInput_Boss_started != true) { continue; }
-                if (Lost_BOSS_HP.ElapsedMilliseconds > reset_timeout) { break; }
+                //if (Lost_BOSS_HP.ElapsedMilliseconds > reset_timeout) { break; } //this is causing an issue when waiting before boss
 
                 try { Boss_HP_average = Boss_hp_history.Average(); }
                 catch { Boss_HP_average = 100; }
@@ -215,20 +223,24 @@ namespace Mabi_CV
 
 
                 //Check if we need to make an annoucement
-                if (AnnoucmentCheck(ref p95, ckbx_95.Checked, 95, 99, Boss_HP, synth, "Day Lights, Night Doom, Night Chill") == true)
+                AnnoucmentCheck(ref p95, ckbx_95.Checked, 95, 99, Boss_HP, synth, "Day Lights, Night Doom, Night Chill");
+                if (DoomMonitor.IsAlive != true && Boss_HP > 75 && Boss_HP <= 94.99)
                 {
                     start_doom_monitor();
                 }
-                if (AnnoucmentCheck(ref p75, ckbx_75.Checked, 75, 80, Boss_HP, synth, "Hit Check") == true)
+                AnnoucmentCheck(ref p75, ckbx_75.Checked, 75, 80, Boss_HP, synth, "Hit Check");
+                if (DoomMonitor.IsAlive == true && Boss_HP > 55 && Boss_HP <= 74.99)
                 {
                     stop_doom_monitor();
                 }
                 AnnoucmentCheck(ref p65, ckbx_65.Checked, 65, 70, Boss_HP, synth, "Night Swords");
-                if (AnnoucmentCheck(ref p55, ckbx_55.Checked, 55, 60, Boss_HP, synth, "Swap, Night Lights, Day Doom, Day Chill") == true)
+                AnnoucmentCheck(ref p55, ckbx_55.Checked, 55, 60, Boss_HP, synth, "Swap, Night Lights, Day Doom, Day Chill");
+                if (DoomMonitor.IsAlive != true && Boss_HP > 35 && Boss_HP <= 54.99)
                 {
                     start_doom_monitor();
                 }
-                if (AnnoucmentCheck(ref p35, ckbx_35.Checked, 35, 40, Boss_HP, synth, "Hit Check") == true)
+                AnnoucmentCheck(ref p35, ckbx_35.Checked, 35, 40, Boss_HP, synth, "Hit Check");
+                if (DoomMonitor.IsAlive == true && Boss_HP > 0 && Boss_HP <= 34.99)
                 {
                     stop_doom_monitor();
                 }
