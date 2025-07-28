@@ -77,8 +77,9 @@
             ckbx_doomVoice = new CheckBox();
             ckbx_doom_Beep = new CheckBox();
             tp_debuff = new TabPage();
-            btn_start_debuff = new Button();
             btn_stop_debuff = new Button();
+            btn_start_debuff = new Button();
+            richtx_debuffs = new RichTextBox();
             ((System.ComponentModel.ISupportInitialize)pb_debugging).BeginInit();
             pnl_Crop.SuspendLayout();
             tc_main.SuspendLayout();
@@ -586,6 +587,7 @@
             // 
             // tp_debuff
             // 
+            tp_debuff.Controls.Add(richtx_debuffs);
             tp_debuff.Controls.Add(btn_stop_debuff);
             tp_debuff.Controls.Add(btn_start_debuff);
             tp_debuff.Location = new Point(4, 24);
@@ -595,9 +597,19 @@
             tp_debuff.Text = "Debuff";
             tp_debuff.UseVisualStyleBackColor = true;
             // 
+            // btn_stop_debuff
+            // 
+            btn_stop_debuff.Location = new Point(113, 19);
+            btn_stop_debuff.Name = "btn_stop_debuff";
+            btn_stop_debuff.Size = new Size(102, 59);
+            btn_stop_debuff.TabIndex = 22;
+            btn_stop_debuff.Text = "Stop Debuff Tracking";
+            btn_stop_debuff.UseVisualStyleBackColor = true;
+            btn_stop_debuff.Click += btn_stop_debuff_Click;
+            // 
             // btn_start_debuff
             // 
-            btn_start_debuff.Location = new Point(1125, 207);
+            btn_start_debuff.Location = new Point(5, 19);
             btn_start_debuff.Name = "btn_start_debuff";
             btn_start_debuff.Size = new Size(102, 59);
             btn_start_debuff.TabIndex = 21;
@@ -605,15 +617,13 @@
             btn_start_debuff.UseVisualStyleBackColor = true;
             btn_start_debuff.Click += btn_start_debuff_Click;
             // 
-            // btn_stop_debuff
+            // richtx_debuffs
             // 
-            btn_stop_debuff.Location = new Point(1125, 291);
-            btn_stop_debuff.Name = "btn_stop_debuff";
-            btn_stop_debuff.Size = new Size(102, 59);
-            btn_stop_debuff.TabIndex = 22;
-            btn_stop_debuff.Text = "Stop Debuff Tracking";
-            btn_stop_debuff.UseVisualStyleBackColor = true;
-            btn_stop_debuff.Click += btn_stop_debuff_Click;
+            richtx_debuffs.Location = new Point(372, 117);
+            richtx_debuffs.Name = "richtx_debuffs";
+            richtx_debuffs.Size = new Size(498, 584);
+            richtx_debuffs.TabIndex = 23;
+            richtx_debuffs.Text = "";
             // 
             // Main
             // 
@@ -689,5 +699,6 @@
         private TextBox debuff_tl_x;
         private Button btn_stop_debuff;
         private Button btn_start_debuff;
+        private RichTextBox richtx_debuffs;
     }
 }

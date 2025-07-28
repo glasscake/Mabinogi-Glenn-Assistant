@@ -17,6 +17,9 @@
     <None Remove="Refrences\Debuffs\aspect_of_fortificaiton.jpg" />
     <None Remove="Refrences\Debuffs\aspect_of_reversal.jpg" />
     <None Remove="Refrences\Debuffs\aspect_of_swiftness.jpg" />
+    <None Remove="Refrences\Debuffs\astrology_damage.jpg" />
+    <None Remove="Refrences\Debuffs\astrology_def.jpg" />
+    <None Remove="Refrences\Debuffs\ballon.jpg" />
     <None Remove="Refrences\Debuffs\brionac_pragarah_def.jpg" />
     <None Remove="Refrences\Debuffs\brionac_pragarah_magic.jpg" />
     <None Remove="Refrences\Debuffs\cat_pet.jpg" />
@@ -47,6 +50,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Refrences\Debuffs\aspect_of_swiftness.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Refrences\Debuffs\astrology_damage.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Refrences\Debuffs\astrology_def.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Refrences\Debuffs\ballon.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Refrences\Debuffs\brionac_pragarah_def.jpg">

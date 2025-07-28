@@ -14,6 +14,7 @@ using Tesseract;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Speech.Synthesis;
+using System.Security.Cryptography.Xml;
 
 
 
@@ -426,4 +427,17 @@ namespace Mabi_CV
 
     }
 
+    public class Debuff_Icon
+    {
+        public string Name;
+        public Mat refrence;
+        
+        public Debuff_Icon(string filename)
+        {
+            refrence = Cv2.ImRead(filename);
+            Cv2.CvtColor(refrence,refrence,ColorConversionCodes.BGR2BGRA);
+            Name = Path.GetFileNameWithoutExtension(filename);
+            Name = Name.Replace('_', ' ');
+        }
+    }
 }

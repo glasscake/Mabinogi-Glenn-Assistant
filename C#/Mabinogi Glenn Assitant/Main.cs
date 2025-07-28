@@ -405,6 +405,16 @@ namespace Mabi_CV
                 icon_crops.Add(new Rect(icon_gap * i + icon_square_size * i, 0, icon_square_size, icon_square_size));
                 icons.Add(mask.SubMat(icon_crops[i]));
             }
+            List<Debuff_Icon> debuffs = new List<Debuff_Icon>();
+
+            foreach(string file in Directory.GetFiles("./Refrences/Debuffs"))
+            {
+                debuffs.Add(new Debuff_Icon(file));
+            }
+
+            OpenCvSharp.Quality.QualityBase qualityBase;
+            OpenCvSharp.Quality.QualityMSE qualityMSE;
+            
 
             //{
             //    int i = 0;
@@ -430,15 +440,35 @@ namespace Mabi_CV
                     i++;
                 }
 
-                //foreach(Mat mat in icons)
-                //{
-                //    Cv2.ImShow("slideshow", mat);
-                //    Cv2.WaitKey(100);
-                //}
+                Mat test = new Mat();
+                Scalar scalar = new Scalar();
 
-                Cv2.ImShow("mask", mask);
-                Cv2.WaitKey(1);
+                string output ="";
+                //each of the icons we cropped this frame
+                foreach (Mat icon in icons)
+                {
+                    //compared to each debuff in the refrence pictures
+                    //this could be sped up by removing debuff refrence images as they are detected possibly by duplicating the list of refrence icons and removing them every time?
+                    foreach (Debuff_Icon debuff in debuffs)
+                    {
+                        scalar = OpenCvSharp.Quality.QualityMSE.Compute(icon, debuff.refrence, test);
+                        //Debug.WriteLine(scalar.ToString());
+                        if (scalar.Val0 < 500 && scalar.Val1 < 500)
+                        {
+                            Cv2.ImShow("mat1", icon);
+                            Cv2.ImShow("mat2", debuff.refrence);
+                            //Cv2.WaitKey(1000);
+                            output = output + debuff.Name + Environment.NewLine;
+                            break;
+                        }
+                    }
+                }
+
+
+                //Cv2.ImShow("mask", mask);
+                //Cv2.WaitKey(1);
                 pb_debugging.Invoke(() => pb_debugging.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(mask));
+                richtx_debuffs.Invoke(() => richtx_debuffs.Text = output);
             }
             mask.Dispose();
         }
