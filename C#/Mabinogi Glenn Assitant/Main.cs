@@ -48,10 +48,7 @@ namespace Mabi_CV
             Thread HPMonitor = new Thread(() => Boss_HP_Monitor(cts_HP.Token));
             cts_doom = new CancellationTokenSource();
             DoomMonitor = new Thread(() => DoomParser(cts_doom.Token));
-            cts_debuff = new CancellationTokenSource();
-            DebuffMonitor = new Thread(() => Debuff_Monitor(cts_doom.Token));
-            //HPMonitor.Start();
-            DebuffMonitor.Start();
+
         }
 
         private void btn_debugging_Click(object sender, EventArgs e)
@@ -59,6 +56,26 @@ namespace Mabi_CV
 
         }
 
+        private void start_thread(ref CancellationTokenSource cts, Thread thread, Action<CancellationToken> method, string threadname)
+        {
+            cts = new CancellationTokenSource();
+            CancellationToken token = cts.Token;
+            thread = new Thread(() => method(token));
+            thread.Name = threadname;   
+            thread.Start();
+        }
+
+        private void stop_thread(ref CancellationTokenSource cts, Thread thread, int timeout)
+        {
+            cts.Cancel();
+            Stopwatch countdown = new Stopwatch();
+            countdown.Start();
+            if (thread == null) { return; }
+            while (thread.ThreadState == System.Threading.ThreadState.Running && countdown.ElapsedMilliseconds < timeout)
+            {
+
+            }
+        }
         private void reset_doom_monitor()
         {
             stop_doom_monitor();
@@ -141,7 +158,7 @@ namespace Mabi_CV
             while (true)
             {
                 Thread.Sleep(100);
-                
+
                 if (token.IsCancellationRequested == true) { break; }
 
                 if (UserInput_Boss_started != true) { continue; }
@@ -383,12 +400,21 @@ namespace Mabi_CV
             int icon_count = 28;
             List<Mat> icons = new List<Mat>();
             List<Rect> icon_crops = new List<Rect>();
-            for(int i = 0; i < icon_count; i++)
+            for (int i = 0; i < icon_count; i++)
             {
-                icon_crops.Add(new Rect(icon_gap*i + icon_square_size*i,  0, icon_square_size, icon_square_size));
-                icons.Add( mask.SubMat(icon_crops[i]));
+                icon_crops.Add(new Rect(icon_gap * i + icon_square_size * i, 0, icon_square_size, icon_square_size));
+                icons.Add(mask.SubMat(icon_crops[i]));
             }
 
+            //{
+            //    int i = 0;
+            //    foreach (Mat mat in icons)
+            //    {
+            //        Bitmap output = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(mat);
+            //        output.Save(i.ToString() + ".jpg");
+            //        i++;
+            //    }
+            //}
             while (true)
             {
                 if (token.IsCancellationRequested)
@@ -398,16 +424,18 @@ namespace Mabi_CV
                 Thread.Sleep(wait_time);
                 mask = Debuff_Cap.Crop;
                 int i = 0;
-                foreach(Rect crop in icon_crops)
+                foreach (Rect crop in icon_crops)
                 {
                     icons[i] = mask.SubMat(crop);
                     i++;
                 }
+
                 //foreach(Mat mat in icons)
                 //{
                 //    Cv2.ImShow("slideshow", mat);
                 //    Cv2.WaitKey(100);
                 //}
+
                 Cv2.ImShow("mask", mask);
                 Cv2.WaitKey(1);
                 pb_debugging.Invoke(() => pb_debugging.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(mask));
@@ -528,6 +556,16 @@ namespace Mabi_CV
             cts_doom.Cancel();
             cts_HP.Cancel();
             screencap.stop_livestream();
+        }
+
+        private void btn_start_debuff_Click(object sender, EventArgs e)
+        {
+            start_thread(ref cts_debuff, DebuffMonitor, Debuff_Monitor, "debuff_monitor");
+        }
+
+        private void btn_stop_debuff_Click(object sender, EventArgs e)
+        {
+            stop_thread(ref cts_debuff,DebuffMonitor,10*1000);
         }
     }
 

@@ -13,11 +13,79 @@
 
   <ItemGroup>
     <None Remove="Refrences\bosshp\bosshp.jpg" />
+    <None Remove="Refrences\Debuffs\asepct_of_might.jpg" />
+    <None Remove="Refrences\Debuffs\aspect_of_fortificaiton.jpg" />
+    <None Remove="Refrences\Debuffs\aspect_of_reversal.jpg" />
+    <None Remove="Refrences\Debuffs\aspect_of_swiftness.jpg" />
+    <None Remove="Refrences\Debuffs\brionac_pragarah_def.jpg" />
+    <None Remove="Refrences\Debuffs\brionac_pragarah_magic.jpg" />
+    <None Remove="Refrences\Debuffs\cat_pet.jpg" />
+    <None Remove="Refrences\Debuffs\death_mark.jpg" />
+    <None Remove="Refrences\Debuffs\dragon_pet.jpg" />
+    <None Remove="Refrences\Debuffs\foxy_quinn.jpg" />
+    <None Remove="Refrences\Debuffs\hydra.jpg" />
+    <None Remove="Refrences\Debuffs\rend_armor.jpg" />
+    <None Remove="Refrences\Debuffs\smoke_screen.jpg" />
+    <None Remove="Refrences\Debuffs\support_shot.jpg" />
+    <None Remove="Refrences\Debuffs\upper_cut.jpg" />
+    <None Remove="Refrences\Debuffs\urgent_shot.jpg" />
+    <None Remove="Refrences\Debuffs\wolf_pet.jpg" />
     <None Remove="Refrences\eng.traineddata" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="Refrences\bosshp\bosshp.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Refrences\Debuffs\asepct_of_might.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Refrences\Debuffs\aspect_of_fortificaiton.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Refrences\Debuffs\aspect_of_reversal.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Refrences\Debuffs\aspect_of_swiftness.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Refrences\Debuffs\brionac_pragarah_def.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Refrences\Debuffs\brionac_pragarah_magic.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Refrences\Debuffs\cat_pet.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Refrences\Debuffs\death_mark.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Refrences\Debuffs\dragon_pet.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Refrences\Debuffs\foxy_quinn.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Refrences\Debuffs\hydra.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Refrences\Debuffs\rend_armor.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Refrences\Debuffs\smoke_screen.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Refrences\Debuffs\support_shot.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Refrences\Debuffs\upper_cut.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Refrences\Debuffs\urgent_shot.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Refrences\Debuffs\wolf_pet.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Refrences\eng.traineddata">
