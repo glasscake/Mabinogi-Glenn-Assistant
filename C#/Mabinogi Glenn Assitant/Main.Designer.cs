@@ -31,6 +31,15 @@
             pb_debugging = new PictureBox();
             doom_tl_x = new TextBox();
             pnl_Crop = new Panel();
+            label11 = new Label();
+            label12 = new Label();
+            label13 = new Label();
+            label14 = new Label();
+            debuff_br_y = new TextBox();
+            debuff_tl_y = new TextBox();
+            debuff_br_x = new TextBox();
+            label15 = new Label();
+            debuff_tl_x = new TextBox();
             label6 = new Label();
             label7 = new Label();
             label8 = new Label();
@@ -67,6 +76,7 @@
             btn_resetDoom = new Button();
             ckbx_doomVoice = new CheckBox();
             ckbx_doom_Beep = new CheckBox();
+            tp_debuff = new TabPage();
             ((System.ComponentModel.ISupportInitialize)pb_debugging).BeginInit();
             pnl_Crop.SuspendLayout();
             tc_main.SuspendLayout();
@@ -93,6 +103,15 @@
             // 
             // pnl_Crop
             // 
+            pnl_Crop.Controls.Add(label11);
+            pnl_Crop.Controls.Add(label12);
+            pnl_Crop.Controls.Add(label13);
+            pnl_Crop.Controls.Add(label14);
+            pnl_Crop.Controls.Add(debuff_br_y);
+            pnl_Crop.Controls.Add(debuff_tl_y);
+            pnl_Crop.Controls.Add(debuff_br_x);
+            pnl_Crop.Controls.Add(label15);
+            pnl_Crop.Controls.Add(debuff_tl_x);
             pnl_Crop.Controls.Add(label6);
             pnl_Crop.Controls.Add(label7);
             pnl_Crop.Controls.Add(label8);
@@ -113,8 +132,85 @@
             pnl_Crop.Controls.Add(doom_tl_x);
             pnl_Crop.Location = new Point(1248, 51);
             pnl_Crop.Name = "pnl_Crop";
-            pnl_Crop.Size = new Size(279, 297);
+            pnl_Crop.Size = new Size(279, 387);
             pnl_Crop.TabIndex = 3;
+            // 
+            // label11
+            // 
+            label11.AutoSize = true;
+            label11.Location = new Point(146, 281);
+            label11.Name = "label11";
+            label11.Size = new Size(78, 15);
+            label11.TabIndex = 27;
+            label11.Text = "Bottom Right";
+            // 
+            // label12
+            // 
+            label12.AutoSize = true;
+            label12.Location = new Point(21, 331);
+            label12.Name = "label12";
+            label12.Size = new Size(13, 15);
+            label12.TabIndex = 26;
+            label12.Text = "y";
+            // 
+            // label13
+            // 
+            label13.AutoSize = true;
+            label13.Location = new Point(21, 302);
+            label13.Name = "label13";
+            label13.Size = new Size(13, 15);
+            label13.TabIndex = 21;
+            label13.Text = "x";
+            // 
+            // label14
+            // 
+            label14.AutoSize = true;
+            label14.Location = new Point(40, 281);
+            label14.Name = "label14";
+            label14.Size = new Size(49, 15);
+            label14.TabIndex = 25;
+            label14.Text = "Top Left";
+            // 
+            // debuff_br_y
+            // 
+            debuff_br_y.Location = new Point(146, 328);
+            debuff_br_y.Name = "debuff_br_y";
+            debuff_br_y.Size = new Size(100, 23);
+            debuff_br_y.TabIndex = 24;
+            debuff_br_y.Text = "1230";
+            // 
+            // debuff_tl_y
+            // 
+            debuff_tl_y.Location = new Point(40, 328);
+            debuff_tl_y.Name = "debuff_tl_y";
+            debuff_tl_y.Size = new Size(100, 23);
+            debuff_tl_y.TabIndex = 23;
+            debuff_tl_y.Text = "1214";
+            // 
+            // debuff_br_x
+            // 
+            debuff_br_x.Location = new Point(146, 299);
+            debuff_br_x.Name = "debuff_br_x";
+            debuff_br_x.Size = new Size(100, 23);
+            debuff_br_x.TabIndex = 22;
+            debuff_br_x.Text = "1529";
+            // 
+            // label15
+            // 
+            label15.AutoSize = true;
+            label15.Location = new Point(3, 255);
+            label15.Name = "label15";
+            label15.Size = new Size(99, 15);
+            label15.TabIndex = 20;
+            label15.Text = "Boss Debuff Crop";
+            // 
+            // debuff_tl_x
+            // 
+            debuff_tl_x.Location = new Point(40, 299);
+            debuff_tl_x.Name = "debuff_tl_x";
+            debuff_tl_x.Size = new Size(100, 23);
+            debuff_tl_x.TabIndex = 19;
+            debuff_tl_x.Text = "1025";
             // 
             // label6
             // 
@@ -275,6 +371,7 @@
             tc_main.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tc_main.Controls.Add(tp_main);
             tc_main.Controls.Add(tp_debug);
+            tc_main.Controls.Add(tp_debuff);
             tc_main.Location = new Point(3, 1);
             tc_main.Name = "tc_main";
             tc_main.SelectedIndex = 0;
@@ -349,7 +446,7 @@
             // 
             // btn_ResetHP
             // 
-            btn_ResetHP.Location = new Point(1355, 379);
+            btn_ResetHP.Location = new Point(1361, 491);
             btn_ResetHP.Name = "btn_ResetHP";
             btn_ResetHP.Size = new Size(102, 45);
             btn_ResetHP.TabIndex = 17;
@@ -452,7 +549,7 @@
             // 
             // btn_resetDoom
             // 
-            btn_resetDoom.Location = new Point(1229, 379);
+            btn_resetDoom.Location = new Point(1235, 491);
             btn_resetDoom.Name = "btn_resetDoom";
             btn_resetDoom.Size = new Size(102, 45);
             btn_resetDoom.TabIndex = 8;
@@ -483,6 +580,15 @@
             ckbx_doom_Beep.TabIndex = 6;
             ckbx_doom_Beep.Text = "Doom Beep";
             ckbx_doom_Beep.UseVisualStyleBackColor = true;
+            // 
+            // tp_debuff
+            // 
+            tp_debuff.Location = new Point(4, 24);
+            tp_debuff.Name = "tp_debuff";
+            tp_debuff.Size = new Size(1819, 773);
+            tp_debuff.TabIndex = 2;
+            tp_debuff.Text = "Debuff";
+            tp_debuff.UseVisualStyleBackColor = true;
             // 
             // Main
             // 
@@ -545,5 +651,15 @@
         private Button btn_ResetHP;
         private RichTextBox richtx_debugging_HP;
         private Button btn_debug;
+        private TabPage tp_debuff;
+        private Label label11;
+        private Label label12;
+        private Label label13;
+        private Label label14;
+        private TextBox debuff_br_y;
+        private TextBox debuff_tl_y;
+        private TextBox debuff_br_x;
+        private Label label15;
+        private TextBox debuff_tl_x;
     }
 }

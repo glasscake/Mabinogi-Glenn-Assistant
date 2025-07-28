@@ -23,10 +23,13 @@ namespace Mabi_CV
     {
         Thread DoomMonitor;
         Thread HPMonitor;
+        Thread DebuffMonitor;
+
 
         List<DoomTimer> timers = new List<DoomTimer>();
         CancellationTokenSource cts_doom = new CancellationTokenSource();
         CancellationTokenSource cts_HP = new CancellationTokenSource();
+        CancellationTokenSource cts_debuff = new CancellationTokenSource();
         ScreenCapture screencap = new ScreenCapture();
 
         bool UserInput_Boss_started;
@@ -45,10 +48,15 @@ namespace Mabi_CV
             Thread HPMonitor = new Thread(() => Boss_HP_Monitor(cts_HP.Token));
             cts_doom = new CancellationTokenSource();
             DoomMonitor = new Thread(() => DoomParser(cts_doom.Token));
+            cts_debuff = new CancellationTokenSource();
+            DebuffMonitor = new Thread(() => Debuff_Monitor(cts_doom.Token));
+            //HPMonitor.Start();
+            DebuffMonitor.Start();
         }
 
         private void btn_debugging_Click(object sender, EventArgs e)
         {
+
         }
 
         private void reset_doom_monitor()
@@ -327,7 +335,7 @@ namespace Mabi_CV
 
                 //Cv2.ImShow("mask", mask);
                 //Cv2.ImShow("unmasked", sw.debugging_mat);
-                Cv2.WaitKey(1);
+                //Cv2.WaitKey(1);
                 pb_debugging.Invoke(() => pb_debugging.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(mask));
                 output = reader.Read(OpenCvSharp.Extensions.BitmapConverter.ToBitmap(mask));
                 List<DoomTimer> reader_timers = reader.ParseDoom(output);
@@ -354,7 +362,58 @@ namespace Mabi_CV
 
         }
 
+        private void Debuff_Monitor(CancellationToken token)
+        {
+            Mat mask = new Mat();
+            OCR reader = new OCR();
+            Utils utils = new Utils();
+            int wait_time = 150;
+            SubCapture Debuff_Cap = new SubCapture(screencap.GetCrop, utils.Textboxes_to_Rect(debuff_tl_x, debuff_tl_y, debuff_br_x, debuff_br_y));
+            mask = Debuff_Cap.Crop;
+            //make a list of all the possible slots and cut it up
+            /*
+                each box is 16 pixels tall
+                each box is 16 pixels wide
+                each box has 2 pixels between them
+                there are 28 possible boxes
+             */
 
+            int icon_square_size = 16;
+            int icon_gap = 2;
+            int icon_count = 28;
+            List<Mat> icons = new List<Mat>();
+            List<Rect> icon_crops = new List<Rect>();
+            for(int i = 0; i < icon_count; i++)
+            {
+                icon_crops.Add(new Rect(icon_gap*i + icon_square_size*i,  0, icon_square_size, icon_square_size));
+                icons.Add( mask.SubMat(icon_crops[i]));
+            }
+
+            while (true)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    break;
+                }
+                Thread.Sleep(wait_time);
+                mask = Debuff_Cap.Crop;
+                int i = 0;
+                foreach(Rect crop in icon_crops)
+                {
+                    icons[i] = mask.SubMat(crop);
+                    i++;
+                }
+                //foreach(Mat mat in icons)
+                //{
+                //    Cv2.ImShow("slideshow", mat);
+                //    Cv2.WaitKey(100);
+                //}
+                Cv2.ImShow("mask", mask);
+                Cv2.WaitKey(1);
+                pb_debugging.Invoke(() => pb_debugging.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(mask));
+            }
+            mask.Dispose();
+        }
 
         private void Cull_DoomTimer_List(List<DoomTimer> fresh, ref List<DoomTimer> reoccuring)
         {
