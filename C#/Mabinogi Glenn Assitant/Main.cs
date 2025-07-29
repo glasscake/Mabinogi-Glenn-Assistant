@@ -15,6 +15,7 @@ using System.Speech.Synthesis;
 using static System.Windows.Forms.LinkLabel;
 using System.Text.RegularExpressions;
 using SharpGen.Runtime;
+using System.Reflection;
 
 
 
@@ -67,7 +68,7 @@ namespace Mabi_CV
 
         }
 
-        private void start_thread(ref CancellationTokenSource cts, Thread thread, Action<CancellationToken> method, string threadname)
+        private void start_thread(ref CancellationTokenSource cts,ref Thread thread, Action<CancellationToken> method, string threadname)
         {
             cts = new CancellationTokenSource();
             CancellationToken token = cts.Token;
@@ -76,7 +77,7 @@ namespace Mabi_CV
             thread.Start();
         }
 
-        private void stop_thread(ref CancellationTokenSource cts, Thread thread, int timeout)
+        private void stop_thread(ref CancellationTokenSource cts, ref Thread thread, int timeout)
         {
             cts.Cancel();
             Stopwatch countdown = new Stopwatch();
@@ -84,8 +85,9 @@ namespace Mabi_CV
             if (thread == null) { return; }
             while (thread.ThreadState == System.Threading.ThreadState.Running && countdown.ElapsedMilliseconds < timeout)
             {
-
+                
             }
+            
         }
         private void reset_doom_monitor()
         {
@@ -514,8 +516,8 @@ namespace Mabi_CV
                 richtx_debuffs_missing.Invoke(() => richtx_debuffs_missing.Text = missing);
             }
             mask.Dispose();
+            richtx_debuffs_missing.Invoke(() => richtx_debuffs_missing.Text = "Stopped");
         }
-
         private void Cull_DoomTimer_List(List<DoomTimer> fresh, ref List<DoomTimer> reoccuring)
         {
             if (fresh == null) { return; }
@@ -634,13 +636,13 @@ namespace Mabi_CV
 
         private void btn_start_debuff_Click(object sender, EventArgs e)
         {
-            start_thread(ref cts_debuff, DebuffMonitor, Debuff_Monitor, "debuff_monitor");
+            start_thread(ref cts_debuff, ref DebuffMonitor, Debuff_Monitor, "debuff_monitor");
         }
 
         private void btn_stop_debuff_Click(object sender, EventArgs e)
         {
-            stop_thread(ref cts_debuff, DebuffMonitor, 10 * 1000);
-            richtx_debuffs_missing.Text = "Stopped";
+            stop_thread(ref cts_debuff, ref DebuffMonitor, 10 * 5000);
+            
         }
 
         private void cbx_debuff_fontsize_SelectionChangeCommitted(object sender, EventArgs e)
