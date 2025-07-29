@@ -27,7 +27,7 @@ namespace Mabi_CV
         IEnumerable<Display> displays;
         DX11ScreenCapture screenCapture;
         private int garbagecollector_counter;
-        Thread LiveStream ;
+        Thread LiveStream;
         CaptureZone<ColorBGRA> fullscreen_capture_zone;
         Mat fullscreen_mat = new Mat();
         CancellationTokenSource cts = new CancellationTokenSource();
@@ -89,7 +89,7 @@ namespace Mabi_CV
                 return;
             }
             while (LiveStream.ThreadState == System.Threading.ThreadState.Running && timeout.ElapsedMilliseconds < 5000) { }
-            if(timeout.ElapsedMilliseconds > 5000) { return; }
+            if (timeout.ElapsedMilliseconds > 5000) { return; }
             _start_livestream();
         }
         private void _start_livestream()
@@ -109,7 +109,7 @@ namespace Mabi_CV
     public class SubCapture
     {
         public OpenCvSharp.Rect CropBox;
-        public Mat Crop 
+        public Mat Crop
         {
             get { return Refresh_Mat.Invoke(CropBox); }
             protected set { }
@@ -122,13 +122,13 @@ namespace Mabi_CV
         public delegate Mat Get_Mat(OpenCvSharp.Rect rect);
         Get_Mat Refresh_Mat;
 
-       public SubCapture(Get_Mat del, OpenCvSharp.Rect rect) 
-       {
+        public SubCapture(Get_Mat del, OpenCvSharp.Rect rect)
+        {
             Refresh_Mat = del;
             CropBox = rect;
-       }
-       
-       
+        }
+
+
 
     }
 
@@ -187,12 +187,12 @@ namespace Mabi_CV
             if (lines.Length > 5 || lines.Length < 2)
             {
                 Console.WriteLine(string.Format("cant read: too many or too few lines: {0} must be > 5 & < 2", lines.Length));
-                return null; 
+                return null;
             }
             if (lines[0] != "Time Until the End")
             {
                 Console.WriteLine(("cant read: \"Time Until the End\""));
-                return null; 
+                return null;
             }
 
             //now we must find the time and the player name. Once we get a good lock on 'time until the end' we can be somewhat confident 
@@ -220,7 +220,7 @@ namespace Mabi_CV
                 if (reg_min_sec.Count(clean) != 1 && reg_sec_only.Count(clean) != 1) { continue; }
                 //we have a name and some time lets parse the name
                 string name = reg_parse_name.Match(clean).Value;
-                if (name == "") { continue; }   
+                if (name == "") { continue; }
                 //remove the ' : '
                 name = name.Substring(0, name.Length - 2);
                 //find if we are minutes and seconds or just seconds only one can be true so no need for else if
@@ -247,7 +247,7 @@ namespace Mabi_CV
                 }
                 //we read the time back right lets put it all together
 
-                timers.Add(new DoomTimer(name, new Taylors_Countdown_Timer(minutes * 60 + seconds),false,false));
+                timers.Add(new DoomTimer(name, new Taylors_Countdown_Timer(minutes * 60 + seconds), false, false));
             }
 
 
@@ -328,25 +328,25 @@ namespace Mabi_CV
         //A coutdown timer my wife made from first principles
         public int Time_Remaining
         {
-            get {return calctime(); }
-            private set {}
+            get { return calctime(); }
+            private set { }
         }
 
-         
+
         private Stopwatch timer = new Stopwatch();
         public int startingtime;
-        public Taylors_Countdown_Timer (int input)
+        public Taylors_Countdown_Timer(int input)
         {
             startingtime = input; //:)
             timer.Start();
         }
         private int calctime()
         {
-            if (startingtime < (int)timer.ElapsedMilliseconds / 1000) 
+            if (startingtime < (int)timer.ElapsedMilliseconds / 1000)
             {
-                timer.Stop(); 
-                Time_Remaining = 0; 
-                return 0; 
+                timer.Stop();
+                Time_Remaining = 0;
+                return 0;
             }
             return startingtime - (int)timer.ElapsedMilliseconds / 1000;
         }
@@ -377,7 +377,7 @@ namespace Mabi_CV
             Enable_beep = enable_beep;
             Enable_speach = enable_speach;
             monitor = new Thread(() => monitor_timer(cts.Token));
-            monitor.Name = name;    
+            monitor.Name = name;
             if (Enable_beep == true || enable_speach == true)
             {
                 monitor.Start();
@@ -387,11 +387,11 @@ namespace Mabi_CV
         {
             cts.Cancel();
         }
-        
+
         public void Change_Beep(bool state)
         {
             Enable_beep = state;
-            if(Enable_beep == true && monitor.ThreadState == System.Threading.ThreadState.Unstarted)
+            if (Enable_beep == true && monitor.ThreadState == System.Threading.ThreadState.Unstarted)
             {
                 monitor.Start();
             }
@@ -431,13 +431,27 @@ namespace Mabi_CV
     {
         public string Name;
         public Mat refrence;
-        
+        public bool Enabled = true;
+
         public Debuff_Icon(string filename)
         {
             refrence = Cv2.ImRead(filename);
-            Cv2.CvtColor(refrence,refrence,ColorConversionCodes.BGR2BGRA);
+            Cv2.CvtColor(refrence, refrence, ColorConversionCodes.BGR2BGRA);
             Name = Path.GetFileNameWithoutExtension(filename);
             Name = Name.Replace('_', ' ');
+        }
+    }
+
+    public static class StringUtils
+    {
+        public static string ToParagrah(this List<string> str)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (string input in str) 
+            { 
+                sb.AppendLine(input);
+            }
+            return sb.ToString();
         }
     }
 }

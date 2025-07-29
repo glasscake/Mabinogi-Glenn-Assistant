@@ -14,6 +14,8 @@ using System.Speech;
 using System.Speech.Synthesis;
 using static System.Windows.Forms.LinkLabel;
 using System.Text.RegularExpressions;
+using SharpGen.Runtime;
+
 
 
 
@@ -31,6 +33,7 @@ namespace Mabi_CV
         CancellationTokenSource cts_HP = new CancellationTokenSource();
         CancellationTokenSource cts_debuff = new CancellationTokenSource();
         ScreenCapture screencap = new ScreenCapture();
+        List<Debuff_Icon> debuffs_icons = new List<Debuff_Icon>();
 
         bool UserInput_Boss_started;
 
@@ -38,8 +41,16 @@ namespace Mabi_CV
         public Main()
         {
             InitializeComponent();
-            start_HP_monitor();
             Init_Threads();
+
+            foreach (string file in Directory.GetFiles("./Refrences/Debuffs"))
+            {
+                debuffs_icons.Add(new Debuff_Icon(file));
+            }
+            foreach (Debuff_Icon debuff in debuffs_icons)
+            {
+                ckcbxlst_enabled_debuffs.Items.Add(debuff.Name, debuff.Enabled);
+            }
         }
 
         private void Init_Threads()
@@ -61,7 +72,7 @@ namespace Mabi_CV
             cts = new CancellationTokenSource();
             CancellationToken token = cts.Token;
             thread = new Thread(() => method(token));
-            thread.Name = threadname;   
+            thread.Name = threadname;
             thread.Start();
         }
 
@@ -384,7 +395,7 @@ namespace Mabi_CV
             Mat mask = new Mat();
             OCR reader = new OCR();
             Utils utils = new Utils();
-            int wait_time = 150;
+            int wait_time = 350;
             SubCapture Debuff_Cap = new SubCapture(screencap.GetCrop, utils.Textboxes_to_Rect(debuff_tl_x, debuff_tl_y, debuff_br_x, debuff_br_y));
             mask = Debuff_Cap.Crop;
             //make a list of all the possible slots and cut it up
@@ -405,16 +416,12 @@ namespace Mabi_CV
                 icon_crops.Add(new Rect(icon_gap * i + icon_square_size * i, 0, icon_square_size, icon_square_size));
                 icons.Add(mask.SubMat(icon_crops[i]));
             }
-            List<Debuff_Icon> debuffs = new List<Debuff_Icon>();
 
-            foreach(string file in Directory.GetFiles("./Refrences/Debuffs"))
-            {
-                debuffs.Add(new Debuff_Icon(file));
-            }
+            List<string> debuffs_potential = new List<string>();
+            List<string> debuffs_current = new List<string>();
+            List<string> debuffs_missing = new List<string>();
 
-            OpenCvSharp.Quality.QualityBase qualityBase;
-            OpenCvSharp.Quality.QualityMSE qualityMSE;
-            
+
 
             //{
             //    int i = 0;
@@ -425,6 +432,8 @@ namespace Mabi_CV
             //        i++;
             //    }
             //}
+
+            Stopwatch refresh_delay = new Stopwatch();
             while (true)
             {
                 if (token.IsCancellationRequested)
@@ -443,32 +452,66 @@ namespace Mabi_CV
                 Mat test = new Mat();
                 Scalar scalar = new Scalar();
 
-                string output ="";
-                //each of the icons we cropped this frame
-                foreach (Mat icon in icons)
+                debuffs_current.Clear();
+                debuffs_missing.Clear();
+
+                //start a counter for how many consistent non matches there are. we can speed up cycle time because there is most likely going to be a couple of missing debuffs out of the 28 possible slots
+                int nothing_found_counter = 0;
+                foreach (Mat icon in icons) //each of the icons we cropped this frame
                 {
-                    //compared to each debuff in the refrence pictures
-                    //this could be sped up by removing debuff refrence images as they are detected possibly by duplicating the list of refrence icons and removing them every time?
-                    foreach (Debuff_Icon debuff in debuffs)
+                    //if we cant find a match 3 times in a row then we will exit early
+                    if (nothing_found_counter > 2)
                     {
+                        break;
+                    }
+                    foreach (Debuff_Icon debuff in debuffs_icons)
+                    {
+                        //check if weve already found this debuff
+                        if (debuffs_current.Any(a => a == debuff.Name) == true || debuff.Enabled == false)
+                        {
+                            continue;
+                        }
                         scalar = OpenCvSharp.Quality.QualityMSE.Compute(icon, debuff.refrence, test);
                         //Debug.WriteLine(scalar.ToString());
                         if (scalar.Val0 < 500 && scalar.Val1 < 500)
                         {
-                            Cv2.ImShow("mat1", icon);
-                            Cv2.ImShow("mat2", debuff.refrence);
+                            //Cv2.ImShow("mat1", icon);
+                            //Cv2.ImShow("mat2", debuff.refrence);
                             //Cv2.WaitKey(1000);
-                            output = output + debuff.Name + Environment.NewLine;
+                            debuffs_current.Add(debuff.Name);
+                            nothing_found_counter = 0;
                             break;
                         }
                     }
+                    nothing_found_counter++;
+                }
+                //check if we are missing all the debuffs and give some buffer so we dont flash the screen constantly
+                if (refresh_delay.ElapsedMilliseconds < 10 * 1000)
+                {
+                    if (debuffs_current.Count == 0 && refresh_delay.ElapsedMilliseconds == 0)
+                    {
+                        refresh_delay.Restart();
+                    }
+                    if (debuffs_current.Count == 0)
+                    {
+                        continue;
+                    }
+                }
+                refresh_delay.Reset();
+
+                debuffs_potential.Clear();
+                foreach (Debuff_Icon debuff in debuffs_icons)
+                {
+                    if (debuff.Enabled == true) { debuffs_potential.Add(debuff.Name); }
                 }
 
+                debuffs_missing = debuffs_potential.Except(debuffs_current).ToList();
 
-                //Cv2.ImShow("mask", mask);
-                //Cv2.WaitKey(1);
-                pb_debugging.Invoke(() => pb_debugging.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(mask));
-                richtx_debuffs.Invoke(() => richtx_debuffs.Text = output);
+                string missing = debuffs_missing.ToParagrah();
+                string current = debuffs_current.ToParagrah();
+
+                richtx_debuffs_current.Invoke(() => richtx_debuffs_current.Text = current);
+                richtx_debuffs_missing.Invoke(() => richtx_debuffs_missing.Text = missing);
             }
             mask.Dispose();
         }
@@ -585,6 +628,7 @@ namespace Mabi_CV
             timers.Clear();
             cts_doom.Cancel();
             cts_HP.Cancel();
+            cts_debuff.Cancel();
             screencap.stop_livestream();
         }
 
@@ -595,7 +639,67 @@ namespace Mabi_CV
 
         private void btn_stop_debuff_Click(object sender, EventArgs e)
         {
-            stop_thread(ref cts_debuff,DebuffMonitor,10*1000);
+            stop_thread(ref cts_debuff, DebuffMonitor, 10 * 1000);
+            richtx_debuffs_missing.Text = "Stopped";
+        }
+
+        private void cbx_debuff_fontsize_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            ComboBox cb = (ComboBox)sender;
+            int fontsize;
+            if (int.TryParse(cb.SelectedItem.ToString(), out fontsize) == false)
+            {
+                return;
+            }
+            richtx_debuffs_missing.Font = new Font("Arial", fontsize);
+            richtx_debuffs_current.Font = new Font("Arial", fontsize);
+        }
+
+        private void ckbx_applied_debuff_visability_CheckedChanged(object sender, EventArgs e)
+        {
+            CheckBox cb = (CheckBox)sender;
+            richtx_debuffs_current.Visible = cb.Checked;
+            lbl_applied_debuffs.Visible = cb.Checked;
+
+            ckcbxlst_enabled_debuffs.Location = new System.Drawing.Point(ckcbxlst_enabled_debuffs.Location.X + Visability_adjust(richtx_debuffs_current.Visible, richtx_debuffs_current.Width) ,
+                ckcbxlst_enabled_debuffs.Location.Y);
+            this.Size = new System.Drawing.Size(this.Width + Visability_adjust(richtx_debuffs_current.Visible, richtx_debuffs_current.Width), this.Height);
+        }
+
+        private void ckcbxlst_enabled_debuffs_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            string index_name = ckcbxlst_enabled_debuffs.Items[e.Index].ToString();
+            bool val = false;
+            if (e.NewValue == CheckState.Checked) { val = true; }
+            foreach (Debuff_Icon debuff in debuffs_icons)
+            {
+                if (debuff.Name == index_name)
+                {
+                    debuff.Enabled = val;
+                }
+            }
+
+        }
+
+        private void tc_main_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            TabControl tc = (TabControl)sender;
+            //yeah yeah i know string comparisons womp womp
+            if(tc.SelectedTab.Name == "tp_debuff")
+            {
+                int extra = 0;
+                if(richtx_debuffs_current.Visible == false) { extra = richtx_debuffs_current.Width * -1; }
+                this.Size = new System.Drawing.Size(900 + extra, 801);
+                return;
+            }
+            this.Size = new System.Drawing.Size(1827, 801);
+        }
+
+        private int Visability_adjust(bool positive_adjustment, int increment)
+        {
+            int adjustment = -1;
+            if (positive_adjustment) {adjustment = 1;}
+            return adjustment * increment;
         }
     }
 

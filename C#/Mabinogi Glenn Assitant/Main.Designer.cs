@@ -77,9 +77,16 @@
             ckbx_doomVoice = new CheckBox();
             ckbx_doom_Beep = new CheckBox();
             tp_debuff = new TabPage();
+            ckcbxlst_enabled_debuffs = new CheckedListBox();
+            ckbx_applied_debuff_visability = new CheckBox();
+            label18 = new Label();
+            cbx_debuff_fontsize = new ComboBox();
+            richtx_debuffs_current = new RichTextBox();
+            lbl_applied_debuffs = new Label();
+            label16 = new Label();
+            richtx_debuffs_missing = new RichTextBox();
             btn_stop_debuff = new Button();
             btn_start_debuff = new Button();
-            richtx_debuffs = new RichTextBox();
             ((System.ComponentModel.ISupportInitialize)pb_debugging).BeginInit();
             pnl_Crop.SuspendLayout();
             tc_main.SuspendLayout();
@@ -381,6 +388,7 @@
             tc_main.SelectedIndex = 0;
             tc_main.Size = new Size(1827, 801);
             tc_main.TabIndex = 6;
+            tc_main.SelectedIndexChanged += tc_main_SelectedIndexChanged;
             // 
             // tp_main
             // 
@@ -587,7 +595,14 @@
             // 
             // tp_debuff
             // 
-            tp_debuff.Controls.Add(richtx_debuffs);
+            tp_debuff.Controls.Add(ckcbxlst_enabled_debuffs);
+            tp_debuff.Controls.Add(ckbx_applied_debuff_visability);
+            tp_debuff.Controls.Add(label18);
+            tp_debuff.Controls.Add(cbx_debuff_fontsize);
+            tp_debuff.Controls.Add(richtx_debuffs_current);
+            tp_debuff.Controls.Add(lbl_applied_debuffs);
+            tp_debuff.Controls.Add(label16);
+            tp_debuff.Controls.Add(richtx_debuffs_missing);
             tp_debuff.Controls.Add(btn_stop_debuff);
             tp_debuff.Controls.Add(btn_start_debuff);
             tp_debuff.Location = new Point(4, 24);
@@ -597,9 +612,96 @@
             tp_debuff.Text = "Debuff";
             tp_debuff.UseVisualStyleBackColor = true;
             // 
+            // ckcbxlst_enabled_debuffs
+            // 
+            ckcbxlst_enabled_debuffs.FormattingEnabled = true;
+            ckcbxlst_enabled_debuffs.Location = new Point(660, 147);
+            ckcbxlst_enabled_debuffs.Name = "ckcbxlst_enabled_debuffs";
+            ckcbxlst_enabled_debuffs.Size = new Size(188, 616);
+            ckcbxlst_enabled_debuffs.TabIndex = 30;
+            ckcbxlst_enabled_debuffs.ItemCheck += ckcbxlst_enabled_debuffs_ItemCheck;
+            // 
+            // ckbx_applied_debuff_visability
+            // 
+            ckbx_applied_debuff_visability.AutoSize = true;
+            ckbx_applied_debuff_visability.Checked = true;
+            ckbx_applied_debuff_visability.CheckState = CheckState.Checked;
+            ckbx_applied_debuff_visability.Location = new Point(149, 88);
+            ckbx_applied_debuff_visability.Name = "ckbx_applied_debuff_visability";
+            ckbx_applied_debuff_visability.Size = new Size(156, 19);
+            ckbx_applied_debuff_visability.TabIndex = 29;
+            ckbx_applied_debuff_visability.Text = "Applied Debuff Visability";
+            ckbx_applied_debuff_visability.UseVisualStyleBackColor = true;
+            ckbx_applied_debuff_visability.CheckedChanged += ckbx_applied_debuff_visability_CheckedChanged;
+            // 
+            // label18
+            // 
+            label18.AutoSize = true;
+            label18.Location = new Point(8, 68);
+            label18.Name = "label18";
+            label18.Size = new Size(53, 15);
+            label18.TabIndex = 28;
+            label18.Text = "Font size";
+            // 
+            // cbx_debuff_fontsize
+            // 
+            cbx_debuff_fontsize.FormattingEnabled = true;
+            cbx_debuff_fontsize.Items.AddRange(new object[] { "9", "12", "14", "16", "18", "20", "22", "24", "26", "30", "34", "38", "40" });
+            cbx_debuff_fontsize.Location = new Point(8, 86);
+            cbx_debuff_fontsize.Name = "cbx_debuff_fontsize";
+            cbx_debuff_fontsize.Size = new Size(79, 23);
+            cbx_debuff_fontsize.TabIndex = 27;
+            cbx_debuff_fontsize.SelectionChangeCommitted += cbx_debuff_fontsize_SelectionChangeCommitted;
+            // 
+            // richtx_debuffs_current
+            // 
+            richtx_debuffs_current.BackColor = SystemColors.ButtonHighlight;
+            richtx_debuffs_current.Font = new Font("Segoe UI", 20.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            richtx_debuffs_current.Location = new Point(344, 147);
+            richtx_debuffs_current.Name = "richtx_debuffs_current";
+            richtx_debuffs_current.ReadOnly = true;
+            richtx_debuffs_current.ScrollBars = RichTextBoxScrollBars.Horizontal;
+            richtx_debuffs_current.Size = new Size(300, 623);
+            richtx_debuffs_current.TabIndex = 26;
+            richtx_debuffs_current.Text = "";
+            richtx_debuffs_current.WordWrap = false;
+            // 
+            // lbl_applied_debuffs
+            // 
+            lbl_applied_debuffs.AutoSize = true;
+            lbl_applied_debuffs.Font = new Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            lbl_applied_debuffs.Location = new Point(384, 104);
+            lbl_applied_debuffs.Name = "lbl_applied_debuffs";
+            lbl_applied_debuffs.Size = new Size(222, 40);
+            lbl_applied_debuffs.TabIndex = 25;
+            lbl_applied_debuffs.Text = "Applied Debuffs";
+            // 
+            // label16
+            // 
+            label16.AutoSize = true;
+            label16.Font = new Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label16.Location = new Point(37, 104);
+            label16.Name = "label16";
+            label16.Size = new Size(220, 40);
+            label16.TabIndex = 24;
+            label16.Text = "Missing Debuffs";
+            // 
+            // richtx_debuffs_missing
+            // 
+            richtx_debuffs_missing.BackColor = SystemColors.ButtonHighlight;
+            richtx_debuffs_missing.Font = new Font("Segoe UI", 20.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            richtx_debuffs_missing.Location = new Point(5, 147);
+            richtx_debuffs_missing.Name = "richtx_debuffs_missing";
+            richtx_debuffs_missing.ReadOnly = true;
+            richtx_debuffs_missing.ScrollBars = RichTextBoxScrollBars.Horizontal;
+            richtx_debuffs_missing.Size = new Size(300, 623);
+            richtx_debuffs_missing.TabIndex = 23;
+            richtx_debuffs_missing.Text = "";
+            richtx_debuffs_missing.WordWrap = false;
+            // 
             // btn_stop_debuff
             // 
-            btn_stop_debuff.Location = new Point(113, 19);
+            btn_stop_debuff.Location = new Point(113, 3);
             btn_stop_debuff.Name = "btn_stop_debuff";
             btn_stop_debuff.Size = new Size(102, 59);
             btn_stop_debuff.TabIndex = 22;
@@ -609,21 +711,13 @@
             // 
             // btn_start_debuff
             // 
-            btn_start_debuff.Location = new Point(5, 19);
+            btn_start_debuff.Location = new Point(5, 3);
             btn_start_debuff.Name = "btn_start_debuff";
             btn_start_debuff.Size = new Size(102, 59);
             btn_start_debuff.TabIndex = 21;
             btn_start_debuff.Text = "Start Debuff Tracking";
             btn_start_debuff.UseVisualStyleBackColor = true;
             btn_start_debuff.Click += btn_start_debuff_Click;
-            // 
-            // richtx_debuffs
-            // 
-            richtx_debuffs.Location = new Point(372, 117);
-            richtx_debuffs.Name = "richtx_debuffs";
-            richtx_debuffs.Size = new Size(498, 584);
-            richtx_debuffs.TabIndex = 23;
-            richtx_debuffs.Text = "";
             // 
             // Main
             // 
@@ -643,6 +737,7 @@
             tp_debug.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pb_bosshp).EndInit();
             tp_debuff.ResumeLayout(false);
+            tp_debuff.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -699,6 +794,13 @@
         private TextBox debuff_tl_x;
         private Button btn_stop_debuff;
         private Button btn_start_debuff;
-        private RichTextBox richtx_debuffs;
+        private RichTextBox richtx_debuffs_missing;
+        private RichTextBox richtx_debuffs_current;
+        private Label lbl_applied_debuffs;
+        private Label label16;
+        private Label label18;
+        private ComboBox cbx_debuff_fontsize;
+        private CheckBox ckbx_applied_debuff_visability;
+        private CheckedListBox ckcbxlst_enabled_debuffs;
     }
 }
