@@ -57,10 +57,11 @@ namespace Mabi_CV
         private void Init_Threads()
         {
             cts_HP = new CancellationTokenSource();
-            Thread HPMonitor = new Thread(() => Boss_HP_Monitor(cts_HP.Token));
+            HPMonitor = new Thread(() => Boss_HP_Monitor(cts_HP.Token));
             cts_doom = new CancellationTokenSource();
             DoomMonitor = new Thread(() => DoomParser(cts_doom.Token));
-
+            cts_debuff = new CancellationTokenSource();
+            DebuffMonitor = new Thread(() => Debuff_Monitor(cts_debuff.Token));
         }
 
         private void btn_debugging_Click(object sender, EventArgs e)
@@ -70,6 +71,10 @@ namespace Mabi_CV
 
         private void start_thread(ref CancellationTokenSource cts, ref Thread thread, Action<CancellationToken> method, string threadname)
         {
+            if(thread.ThreadState != System.Threading.ThreadState.Stopped && thread.ThreadState != System.Threading.ThreadState.Unstarted)
+            {
+                return;
+            }
             cts = new CancellationTokenSource();
             CancellationToken token = cts.Token;
             thread = new Thread(() => method(token));
