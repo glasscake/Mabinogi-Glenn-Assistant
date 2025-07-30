@@ -68,7 +68,7 @@ namespace Mabi_CV
 
         }
 
-        private void start_thread(ref CancellationTokenSource cts,ref Thread thread, Action<CancellationToken> method, string threadname)
+        private void start_thread(ref CancellationTokenSource cts, ref Thread thread, Action<CancellationToken> method, string threadname)
         {
             cts = new CancellationTokenSource();
             CancellationToken token = cts.Token;
@@ -85,9 +85,9 @@ namespace Mabi_CV
             if (thread == null) { return; }
             while (thread.ThreadState == System.Threading.ThreadState.Running && countdown.ElapsedMilliseconds < timeout)
             {
-                
+
             }
-            
+
         }
         private void reset_doom_monitor()
         {
@@ -405,11 +405,12 @@ namespace Mabi_CV
                 each box is 16 pixels tall
                 each box is 16 pixels wide
                 each box has 2 pixels between them
+                there is a 2 pixel border around each icon
                 there are 28 possible boxes
              */
 
-            int icon_square_size = 16;
-            int icon_gap = 2;
+            int icon_square_size = 12;
+            int icon_gap = 6;
             int icon_count = 28;
             List<Mat> icons = new List<Mat>();
             List<Rect> icon_crops = new List<Rect>();
@@ -422,8 +423,6 @@ namespace Mabi_CV
             List<string> debuffs_potential = new List<string>();
             List<string> debuffs_current = new List<string>();
             List<string> debuffs_missing = new List<string>();
-
-
 
             //{
             //    int i = 0;
@@ -462,7 +461,7 @@ namespace Mabi_CV
                 foreach (Mat icon in icons) //each of the icons we cropped this frame
                 {
                     //if we cant find a match 3 times in a row then we will exit early
-                    if (nothing_found_counter > 2)
+                    if (nothing_found_counter > 20)
                     {
                         break;
                     }
@@ -475,7 +474,7 @@ namespace Mabi_CV
                         }
                         scalar = OpenCvSharp.Quality.QualityMSE.Compute(icon, debuff.refrence, test);
                         //Debug.WriteLine(scalar.ToString());
-                        if (scalar.Val0 < 500 && scalar.Val1 < 500)
+                        if (scalar.Val0 < 500 && scalar.Val1 < 500 && scalar.Val2 < 500)
                         {
                             //Cv2.ImShow("mat1", icon);
                             //Cv2.ImShow("mat2", debuff.refrence);
@@ -642,7 +641,7 @@ namespace Mabi_CV
         private void btn_stop_debuff_Click(object sender, EventArgs e)
         {
             stop_thread(ref cts_debuff, ref DebuffMonitor, 10 * 5000);
-            
+
         }
 
         private void cbx_debuff_fontsize_SelectionChangeCommitted(object sender, EventArgs e)
@@ -663,7 +662,7 @@ namespace Mabi_CV
             richtx_debuffs_current.Visible = cb.Checked;
             lbl_applied_debuffs.Visible = cb.Checked;
 
-            ckcbxlst_enabled_debuffs.Location = new System.Drawing.Point(ckcbxlst_enabled_debuffs.Location.X + Visability_adjust(richtx_debuffs_current.Visible, richtx_debuffs_current.Width) ,
+            ckcbxlst_enabled_debuffs.Location = new System.Drawing.Point(ckcbxlst_enabled_debuffs.Location.X + Visability_adjust(richtx_debuffs_current.Visible, richtx_debuffs_current.Width),
                 ckcbxlst_enabled_debuffs.Location.Y);
             this.Size = new System.Drawing.Size(this.Width + Visability_adjust(richtx_debuffs_current.Visible, richtx_debuffs_current.Width), this.Height);
         }
@@ -687,10 +686,10 @@ namespace Mabi_CV
         {
             TabControl tc = (TabControl)sender;
             //yeah yeah i know string comparisons womp womp
-            if(tc.SelectedTab.Name == "tp_debuff")
+            if (tc.SelectedTab.Name == "tp_debuff")
             {
                 int extra = 0;
-                if(richtx_debuffs_current.Visible == false) { extra = richtx_debuffs_current.Width * -1; }
+                if (richtx_debuffs_current.Visible == false) { extra = richtx_debuffs_current.Width * -1; }
                 this.Size = new System.Drawing.Size(900 + extra, 801);
                 return;
             }
@@ -700,8 +699,15 @@ namespace Mabi_CV
         private int Visability_adjust(bool positive_adjustment, int increment)
         {
             int adjustment = -1;
-            if (positive_adjustment) {adjustment = 1;}
+            if (positive_adjustment) { adjustment = 1; }
             return adjustment * increment;
+        }
+
+        private void btn_debug_save_Click(object sender, EventArgs e)
+        {
+            Utils utils = new Utils();
+            SubCapture Debuff_Cap = new SubCapture(screencap.GetCrop, utils.Textboxes_to_Rect(debuff_tl_x, debuff_tl_y, debuff_br_x, debuff_br_y));
+            Debuff_Cap.Crop_Image.Save("crop.jpg");
         }
     }
 

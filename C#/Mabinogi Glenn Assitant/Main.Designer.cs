@@ -77,6 +77,7 @@
             ckbx_doomVoice = new CheckBox();
             ckbx_doom_Beep = new CheckBox();
             tp_debuff = new TabPage();
+            btn_debug_save = new Button();
             ckcbxlst_enabled_debuffs = new CheckedListBox();
             ckbx_applied_debuff_visability = new CheckBox();
             label18 = new Label();
@@ -188,7 +189,7 @@
             debuff_br_y.Name = "debuff_br_y";
             debuff_br_y.Size = new Size(100, 23);
             debuff_br_y.TabIndex = 24;
-            debuff_br_y.Text = "1230";
+            debuff_br_y.Text = "1228";
             // 
             // debuff_tl_y
             // 
@@ -196,7 +197,7 @@
             debuff_tl_y.Name = "debuff_tl_y";
             debuff_tl_y.Size = new Size(100, 23);
             debuff_tl_y.TabIndex = 23;
-            debuff_tl_y.Text = "1214";
+            debuff_tl_y.Text = "1216";
             // 
             // debuff_br_x
             // 
@@ -221,7 +222,7 @@
             debuff_tl_x.Name = "debuff_tl_x";
             debuff_tl_x.Size = new Size(100, 23);
             debuff_tl_x.TabIndex = 19;
-            debuff_tl_x.Text = "1025";
+            debuff_tl_x.Text = "1027";
             // 
             // label6
             // 
@@ -595,6 +596,7 @@
             // 
             // tp_debuff
             // 
+            tp_debuff.Controls.Add(btn_debug_save);
             tp_debuff.Controls.Add(ckcbxlst_enabled_debuffs);
             tp_debuff.Controls.Add(ckbx_applied_debuff_visability);
             tp_debuff.Controls.Add(label18);
@@ -611,6 +613,16 @@
             tp_debuff.TabIndex = 2;
             tp_debuff.Text = "Debuff";
             tp_debuff.UseVisualStyleBackColor = true;
+            // 
+            // btn_debug_save
+            // 
+            btn_debug_save.Location = new Point(384, 32);
+            btn_debug_save.Name = "btn_debug_save";
+            btn_debug_save.Size = new Size(70, 51);
+            btn_debug_save.TabIndex = 31;
+            btn_debug_save.Text = "save";
+            btn_debug_save.UseVisualStyleBackColor = true;
+            btn_debug_save.Click += btn_debug_save_Click;
             // 
             // ckcbxlst_enabled_debuffs
             // 
@@ -802,5 +814,6 @@
         private ComboBox cbx_debuff_fontsize;
         private CheckBox ckbx_applied_debuff_visability;
         private CheckedListBox ckcbxlst_enabled_debuffs;
+        private Button btn_debug_save;
     }
 }
