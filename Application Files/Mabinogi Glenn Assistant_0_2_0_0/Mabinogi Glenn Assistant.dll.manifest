@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
-  <asmv1:assemblyIdentity name="Mabinogi Glenn Assistant.exe" version="0.1.2.0" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
+  <asmv1:assemblyIdentity name="Mabinogi Glenn Assistant.exe" version="0.2.0.0" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
   <application />
   <entryPoint>
     <assemblyIdentity name="Launcher" version="8.0.0.0" language="neutral" processorArchitecture="msil" />
@@ -71,13 +71,13 @@
       <dsig:DigestValue>GxoFZesYlQOPLzkf+HQ7sBgx9LzayjShIzOClf8fEXA=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Mabinogi Glenn Assistant.dll" size="32256">
+  <file name="Mabinogi Glenn Assistant.dll" size="43520">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>FRWb52Uc7YHUtJDmJFpelA6/ViLY9MUcRimrm+Uo/+4=</dsig:DigestValue>
+      <dsig:DigestValue>ZMzWFKZ7gdJsirFLYL1vr8DgqlpFIGUP0mIkxAKsVNs=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Mabinogi Glenn Assistant.exe" size="150016">
@@ -86,7 +86,7 @@
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>rQ9HaVHyghpCrolrjEajqXoVVO9HEHXdsQ6q3ZhZo5k=</dsig:DigestValue>
+      <dsig:DigestValue>2GmiRu/g1PDbsRxFYFdZKruL/jNZxrma38lufNd7k5g=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Mabinogi Glenn Assistant.runtimeconfig.json" size="515">
@@ -123,6 +123,177 @@
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
       <dsig:DigestValue>KK0WxHld/D+TEEeRc9ladQCJyjN2us4dsTl68RK1iTc=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Refrences\Debuffs\asepct_of_might.jpg" size="8869">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>BG7CwAtS/A4QB1VWKONzWnzeQ7nhzOmxyo3yy61+lLw=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Refrences\Debuffs\aspect_of_fortificaiton.jpg" size="8794">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>3vABT53n5iin9L9zLvNi7kqaXgY/84KIez+0Tk6UvnQ=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Refrences\Debuffs\aspect_of_reversal.jpg" size="8757">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>tkKobmVo06/ECZDZmpgL0URpIMoQH3kHWLgvVf6PgNU=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Refrences\Debuffs\aspect_of_swiftness.jpg" size="8884">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>0i+vUD4Heul4hXt1iaAgxLpwHnJiXe5e2zIIPL91IE0=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Refrences\Debuffs\astrology_damage.jpg" size="8835">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>CxZjVcmuy5NMt5+612Zoj/ybQ55wIX+QLpUMc73nXvM=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Refrences\Debuffs\astrology_def.jpg" size="8775">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>TMDuaNL7PaWS4CDFyp6QSUFkuiVPKLPrb/89r/atmXY=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Refrences\Debuffs\ballon.jpg" size="8870">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>ZXGBFTYbHsnfqBWaEHuTCwHqQ/o76hyE2m3FTz0RolY=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Refrences\Debuffs\brionac_pragarah_def.jpg" size="8833">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>Z+i5fsikzqfngcnyoI8I0iKHNHXd3ofWZ+cETNJpSZI=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Refrences\Debuffs\brionac_pragarah_magic.jpg" size="8814">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>OJx0MoSf1gzp2PYseR5glivsY0v6SJp6SjUxLe3/WRQ=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Refrences\Debuffs\cat_pet.jpg" size="8748">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>y0GPzply1/jpkUBr4gXVz+PDKmuHCVz+BiogXqyjkeQ=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Refrences\Debuffs\death_mark.jpg" size="8725">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>bATdQKzKa0hY6tGHnKjNiq5o2soju32kSfEpq9gqaJc=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Refrences\Debuffs\dragon_pet.jpg" size="8784">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>7tMMcmn44JDY1CaOEArhdWNU7qKt4I9O93+/KRvAIdY=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Refrences\Debuffs\foxy_quinn.jpg" size="8716">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>z2dOYrauoBUFcaC816esVmpAXPbZGMNFqG4QkE/azEE=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Refrences\Debuffs\glyph.jpg" size="8735">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>IhbIqd0W6yB63kHOBuWC08Hbdm1DM7fkA/CowYdoIY8=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Refrences\Debuffs\hydra.jpg" size="9796">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>vJgw0H5m3FMK2/59FkYFIswthv7QOTxaDKRa0Q7a3Yg=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Refrences\Debuffs\rend_armor.jpg" size="8854">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>Ns6MqxoTsH0NemoaBZjkYGJ46Y1oo+BvEW0ZX4LALXc=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Refrences\Debuffs\smoke_screen.jpg" size="8801">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>5KC7malxfwqg/f81n9YM+9vKxo01rQq/ali4lRujQlQ=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Refrences\Debuffs\support_shot.jpg" size="8467">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>q2BiGpKqRP6J5v976D/GNCdACGcjlJFkaY3Xo73YEhQ=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Refrences\Debuffs\upper_cut.jpg" size="8780">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>YiyYhFpBb35usTjZItLx94H/6fg13r4kLIdPtkTO6xg=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Refrences\eng.traineddata" size="4113088">
